@@ -229,7 +229,7 @@ ode.func <- function(time, Initial.values, Parameters, custom.func){
 
 sample_time <- c(0, 5/60, 0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4, 6, 8, 10, 12, 24, 36, 48, 72, 100) # in hours
 sample_time <- seq(0,100, by=1)
-solution <- ode(times = sample_time,  func = odes, y = inits, parms = params, 
+solution <- ode(times = sample_time,  func = ode.func, y = inits, parms = params, 
                 custom.func = custom.func, method="lsodes",  events = events)
 solution
 
