@@ -35,7 +35,7 @@ Wb_li <-  0.21 * W_li # weight of blood in liver, literature (Brown et al., 1997
 Wb_spl <- 0.22 * W_spl # weight of blood in spleen, literature (Brown et al., 1997) - g
 Wb_re <- 0.04 * W_re # weight of blood in rest of the body, literature (Brown et al., 1997) - g 
 # weight of arterial and venous blood, experimental data and literature - g
-W_blood <- 0.0816 * W_tot - (Wb_spl + Wb_li + Wb_lu + Wb_br + Wb_ht + Wb_ki + Wb_bm + Wb_re)
+W_blood <- 0.0816 * (W_tot - (Wb_spl + Wb_li + Wb_lu + Wb_br + Wb_ht + Wb_ki + Wb_bm + Wb_re))
 
 #Regional blood flows (in mL per hour)
 fQs = 0.0086 # fraction of cardiac output to spleen, literature (Bernareggi and Rowland, 1991) - unitless
