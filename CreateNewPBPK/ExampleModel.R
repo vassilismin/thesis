@@ -14,35 +14,35 @@ dose <- 1.7e03 #micro grams
 
 # tissue weights (in g)
 W_tot <-253.4 # ;body weight, experimental data - g
-W_lu <-1.2 # weight of lungs, experimental data - g
-W_bm <- W_tot*0.03  # weight of bone marrow, literature (Travlos 2006) - g
-W_bm_exp <- 0.02 # weight of extracted bone marrow 
-W_br <- 1.35 # weight of brain, experimental data - g
-W_ht <- 0.87 # weight of heart, experimental data - g
-W_ki <- 2.37 # weight of kidneys, experimental data - g
-W_li <- 10.03 # weight of liver, experimental data - g 
-W_spl <- 0.78 # weight of spleen, experimental data - g
-W_re <- 212.8 # weight of rest of the body, experimental data - g
+W_lu <-0.005*W_tot # weight of lungs, experimental data - g
+W_bm <- 0.0559*W_tot  # weight of bone marrow, literature (Travlos 2006) - g
+#   W_bm_exp <- 0.02 # weight of extracted bone marrow 
+W_br <- 0.0060*W_tot # weight of brain, experimental data - g
+W_ht <- 0.0033*W_tot # weight of heart, experimental data - g
+W_ki <- 0.0073*W_tot # weight of kidneys, experimental data - g
+W_li <- 0.037*W_tot # weight of liver, experimental data - g 
+W_spl <- 0.0020*W_tot # weight of spleen, experimental data - g
+W_re <- W_tot - W_lu - W_bm - W_br - W_ht - W_ki - W_li - W_spl # weight of rest of the body, experimental data - g
 
 # Weight of capillary blood assuming density = 1
 # (capillary blood is given as a percentage of tissue volume)
 Wb_lu <- 0.36 * W_lu # weight of blood in lungs, literature (Brown et al., 1997) - g
 Wb_bm <- 0.1* W_bm # weight of blood in bone marrow, estimated - g
-Wb_br <-  0.07 * W_br  # weight of blood in brain, literature (Brown et al., 1997) - g
+Wb_br <-  0.03 * W_br  # weight of blood in brain, literature (Brown et al., 1997) - g
 Wb_ht <- 0.26 * W_ht # weight of blood in heart, literature (Brown et al., 1997) - g   
 Wb_ki <- 0.16 * W_ki # weight of blood in kidneys, literature (Brown et al., 1997) - g 
 Wb_li <-  0.21 * W_li # weight of blood in liver, literature (Brown et al., 1997) - g
 Wb_spl <- 0.22 * W_spl # weight of blood in spleen, literature (Brown et al., 1997) - g
 Wb_re <- 0.04 * W_re # weight of blood in rest of the body, literature (Brown et al., 1997) - g 
 # weight of arterial and venous blood, experimental data and literature - g
-W_blood <- 0.065 * W_tot - (Wb_spl + Wb_li + Wb_lu + Wb_br + Wb_ht + Wb_ki + Wb_bm + Wb_re)
+W_blood <- 0.0816 * W_tot - (Wb_spl + Wb_li + Wb_lu + Wb_br + Wb_ht + Wb_ki + Wb_bm + Wb_re)
 
 #Regional blood flows (in mL per hour)
-fQs = 0.0146 # fraction of cardiac output to spleen, literature (Bernareggi and Rowland, 1991) - unitless
-fQl = 0.183 # fraction of cardiac output to liver, literature (chapter 5) - unitless
+fQs = 0.0086 # fraction of cardiac output to spleen, literature (Bernareggi and Rowland, 1991) - unitless
+fQl = 0.174 # fraction of cardiac output to liver, literature (chapter 5) - unitless
 fQbr = 0.02	# fraction of cardiac output to brain, literature (chapter 5) - unitless
-fQh = 0.051 # fraction of cardiac output to heart, literature (chapter 5) - unitless
-fQk = 0.141 # fraction of cardiac output to kidneys, literature (chapter 5) - unitless
+fQh = 0.0448 # fraction of cardiac output to heart, literature (chapter 5) - unitless
+fQk = 0.0948 # fraction of cardiac output to kidneys, literature (chapter 5) - unitless
 fQbm = 0.0267 # fraction of cardiac output to bone marrow, literature (Brookes, 1967) - unitless
 fQrest = 1-fQs-fQl-fQbr-fQh-fQk-fQbm # fraction of cardiac output to rest of the body, fitted value - unitless
 Q_tot <- 4980 # cardiac output, literature (chapter 5) - mL/h
