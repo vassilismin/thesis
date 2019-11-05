@@ -6,129 +6,178 @@ functions{
                     real[] rdata,
                     int[] idata) {
                 
-                real dydt[14] ;
-                
-                real Q_MU;real Q_AD;real Q_TE;real Q_SK;real Q_HT;real Q_BR;real Q_KI;real Q_RE;
-                real Q_ST;real Q_SPL;real Q_LU;real Q_LI;real Q_ART;real Q_VEN;
-                
-                real V_MU;real V_AD;real V_TE;real V_SK;real V_HT;real V_BR;real V_KI;real V_RE;
-                real V_ST;real V_SPL;real V_LU;real V_LI;real V_ART;real V_VEN;
-                
-                real KP_MU;real KP_AD;real KP_TE;real KP_SK;real KP_HT;real KP_BR;real KP_KI;real KP_RE;
-                real KP_ST;real KP_SPL;real KP_LU;real KP_LI;
-                
-                real CL;real f_UB;real Q_HA;real Q_HP;real Q_H;real T_inf;real dose; real scale_factor; 
-                            
-                Q_MU = rdata[1];
-                Q_AD = rdata[2];
-                Q_TE = rdata[3];
-                Q_SK = rdata[4];
-                Q_HT = rdata[5];
-                Q_BR = rdata[6];
-                Q_KI = rdata[7];
-                Q_RE = rdata[8];
-                Q_ST = rdata[9];
-                Q_SPL = rdata[10];
-                Q_LU = rdata[11];
-                Q_LI = rdata[12];
-                Q_ART = rdata[11];
-                Q_VEN = rdata[11] ;   
-                
-                V_MU = rdata[13];
-                V_AD = rdata[14];
-                V_TE = rdata[15];
-                V_SK = rdata[16];
-                V_HT = rdata[17];
-                V_BR = rdata[18];
-                V_KI = rdata[19];
-                V_RE = rdata[20];
-                V_ST = rdata[21];
-                V_SPL = rdata[22];
-                V_LU = rdata[23];
-                V_LI = rdata[24];
-                V_ART = rdata[25];
-                V_VEN = rdata[26];
-                
-                
-                scale_factor = exp(theta[2]);
-                KP_MU = rdata[27]*scale_factor;
-                KP_AD = exp(theta[3]);
-                KP_TE = rdata[29]*scale_factor;
-                KP_SK = rdata[30]*scale_factor;
-                KP_HT = rdata[31]*scale_factor;
-                KP_BR = rdata[32]*scale_factor;
-                KP_KI = rdata[33]*scale_factor;
-                KP_RE = rdata[34]*scale_factor;
-                KP_ST = rdata[35]*scale_factor;
-                KP_SPL = rdata[36]*scale_factor;
-                KP_LU = rdata[37]*scale_factor;
-                KP_LI = rdata[38]*scale_factor;
-        		
-              	CL = exp(theta[1]);
-              	f_UB = rdata[39];
-              	Q_HA = Q_LI;
-                Q_HP = Q_SPL + Q_ST;
-                Q_H = Q_HA + Q_HP;
-               	T_inf = rdata[40];
-                dose = rdata[41]; // in mg
-                
-                
-                dydt[1] = Q_MU*(y[13]-y[1]/KP_MU)/V_MU;
-                dydt[2] = Q_AD*(y[13]-y[2]/KP_AD)/V_AD;
-                dydt[3] = Q_TE*(y[13]-y[3]/KP_TE)/V_TE;
-                dydt[4] = Q_SK*(y[13]-y[4]/KP_SK)/V_SK;
-                dydt[5] = Q_HT*(y[13]-y[5]/KP_HT)/V_HT;
-                dydt[6] = Q_BR*(y[13]-y[6]/KP_BR)/V_BR;
-                dydt[7] = Q_KI*(y[13]-y[7]/KP_KI)/V_KI;
-                dydt[8] = Q_RE*(y[13]-y[8]/KP_RE)/V_RE;
-                dydt[9] = Q_ST*(y[13]-y[9]/KP_ST)/V_ST;
-                dydt[10] = Q_SPL*(y[13]-y[10]/KP_SPL)/V_SPL;
-                
-                dydt[11] = Q_LU*(y[14]-y[11]/KP_LU)/V_LU;
-                dydt[12]=(Q_HA*y[13]+Q_ST*y[9]/KP_ST+Q_SPL*y[10]/KP_SPL-(Q_H+CL*f_UB)*y[12]/KP_LI)/V_LI;
-                dydt[13] = Q_ART*(y[11]/KP_LU-y[13])/V_ART;
-                
-                if (t<=T_inf){
-                        dydt[14] = (-Q_LU*y[14]+Q_H*y[12]/KP_LI+Q_MU*y[1]/KP_MU+Q_AD*y[2]/KP_AD+
-                                Q_TE*y[3]/KP_TE+Q_SK*y[4]/KP_SK+Q_HT*y[5]/KP_HT+
-                                Q_BR*y[6]/KP_BR+Q_KI*y[7]/KP_KI+
-                                Q_RE*y[8]/KP_RE+dose/(1000*T_inf))/V_VEN  ;//units are in ng/mL
-                }
-                
-                else{
-                        dydt[14] = (-Q_LU*y[14]+Q_H*y[12]/KP_LI+Q_MU*y[1]/KP_MU+Q_AD*y[2]/KP_AD+
-                                Q_SK*y[4]/KP_SK+Q_TE*y[3]/KP_TE+Q_HT*y[5]/KP_HT+
-                                Q_BR*y[6]/KP_BR+Q_KI*y[7]/KP_KI+
-                                Q_RE*y[8]/KP_RE)/V_VEN  ;
-                }
-             
-                        return dydt;       
-        } 
-        
-        
+              real dydt[21] ;
 
+              real C_lu; real C_re; real C_bm; real C_br; real C_ht; real C_ki; real C_li; real C_spl;            
+              real C_art; real C_ven;
+              
+              real W_lu; real W_re; real W_bm; real W_br; real W_ht; real W_ki; real W_li; real W_spl;real W_blood;            
+              
+              real Wb_lu; real Wb_re; real Wb_bm; real Wb_br; real Wb_ht; real Wb_ki; real Wb_li; real Wb_spl;   
+              
+              real Q_tot; real Q_bm; real Q_br; real Q_ht; real Q_ki; real Q_spl; real Q_li; real Q_re; 
+ 
+              real CLE_u; real x_br; 
+              
+              real M_lu_cap; real M_bm_cap; real M_br_cap;real M_ht_cap;
+              real M_ki_cap; real M_li_cap; real M_spl_cap; real M_blood_cap;
+              real M_re_cap; real x_fast; real x_re; real P;
+              real k_ab0; real k_ab0_spl; real k_de; real CLE_f;
+
+              real kluab; real kreab; real kbmab; real kbrab; real khtab; real kkiab; real kliab; 
+              real ksplab; real kbloodab; 
+
+              
+              // tissue weights (in g)
+              W_lu = rdata[1];
+              W_bm = rdata[2];
+              W_br = rdata[3];
+              W_ht = rdata[4];
+              W_ki = rdata[5];
+              W_li = rdata[6];
+              W_spl =  rdata[7];
+              W_re =  rdata[8] ;
+
+              // Weight of capillary blood assuming density = 1
+              Wb_lu = rdata[9]; 
+              Wb_bm = rdata[10]; 
+              Wb_br = rdata[11];
+              Wb_ht = rdata[12]; 
+              Wb_ki = rdata[13]; 
+              Wb_li = rdata[14]; 
+              Wb_spl = rdata[15]; 
+              Wb_re = rdata[16]; 
+              W_blood = rdata[17]; 
+
+              //Regional blood flows (in mL per hour)
+
+             Q_tot = rdata[18]; 
+             Q_bm = rdata[19]; 
+             Q_br = rdata[20]; 
+             Q_ht = rdata[21]; 
+             Q_ki = rdata[22]; 
+             Q_spl = rdata[23]; 	
+             Q_li = rdata[24]; 
+             Q_re = rdata[25]; 
+
+             CLE_u = rdata[26]; 
+             x_br = rdata[27]; 
+             
+            ///////////params///////////
+            M_lu_cap = exp(theta[1]);
+            M_bm_cap = exp(theta[2]);
+            M_br_cap = exp(theta[3]);
+            M_ht_cap = exp(theta[4]);
+            M_ki_cap = exp(theta[5]);
+            M_li_cap = exp(theta[6]);
+            M_spl_cap = exp(theta[7]);
+            M_blood_cap = exp(theta[8]);
+            M_re_cap = exp(theta[9]);
+
+            x_fast = exp(theta[10]);
+            x_re = exp(theta[11]);
+            P = exp(theta[12]);
+            k_ab0 = exp(theta[13]);
+            k_ab0_spl = exp(theta[14]);
+            k_de = exp(theta[15]);
+            CLE_f = exp(theta[16]);
+
+
+              // concentrations in tissues
+              C_lu = y[1]/W_lu;
+              C_re = y[2]/W_re;
+              C_bm = y[3]/W_bm;
+              C_br = y[4]/W_br;
+              C_ht = y[5]/W_ht;
+              C_ki = y[6]/W_ki;
+              C_li = y[7]/W_li;
+              C_spl = y[8]/W_spl;
+              C_art = y[9]/(0.2*(W_blood + Wb_spl + Wb_li + Wb_lu + Wb_br + Wb_ht + Wb_ki + 
+              Wb_bm +   Wb_re));
+              C_ven = y[10]/(0.8*(W_blood + Wb_spl + Wb_li + Wb_lu + Wb_br + Wb_ht + Wb_ki + 
+              Wb_bm + Wb_re));
+
+              // Uptake rates by phagocytizing cells
+              kluab = k_ab0*(1-(y[11]/(M_lu_cap*W_lu)));
+              kreab = k_ab0*(1-(y[12]/(M_re_cap*W_re)));
+              kbmab = k_ab0*(1-(y[13]/(M_bm_cap*W_bm)));
+              kbrab = k_ab0*(1-(y[14]/(M_br_cap*W_br))); 
+              khtab = k_ab0*(1-(y[15]/(M_ht_cap*W_ht)));
+              kkiab = k_ab0*(1-(y[16]/(M_ki_cap*W_ki)));
+              kliab = k_ab0*(1-(y[17]/(M_li_cap*W_li)));
+              ksplab = k_ab0_spl*(1-(y[18]/(M_spl_cap*W_spl)));
+              kbloodab = k_ab0*(1-(y[19]/(M_blood_cap*W_blood)));
+
+             // Nanoparticles in tissue
+             // lungs
+             dydt[1] = ((x_re*Q_tot)/(1+x_re))*(C_ven-C_lu/P)-(W_lu*C_lu*kluab-y[11]*k_de);
+             // rest of body
+             dydt[2] = ((x_re*Q_re)/(1+x_re))*(C_art-C_re/P)-(W_re*C_re*kreab-y[12]*k_de);
+             // bone marrow
+             dydt[3] = ((x_fast*Q_bm)/(1+x_fast))*(C_art-C_bm/P)-(W_bm*C_bm*kbmab-y[13]*k_de);
+             // brain
+             dydt[4] = ((x_br*Q_br)/(1+x_br))*(C_art-C_br/P)-(W_br*C_br*kbrab-y[14]*k_de);
+             // heart
+             dydt[5] = ((x_re*Q_ht)/(1+x_re))*(C_art-C_ht/P)-(W_ht*C_ht*khtab-y[15]*k_de);
+             // kidneys
+             dydt[6] = ((x_re*Q_ki)/(1+x_re))*(C_art-C_ki/P)-(W_ki*C_ki*kkiab-y[16]*k_de)-C_art*CLE_u*x_fast/(1+x_re) ;
+             // liver
+             dydt[7] = C_art*x_fast*Q_li/(x_fast+1) + Q_spl*x_fast*(C_art+x_fast*C_spl/P)/((1+x_fast) * (1 +x_fast))-(((C_li/P)*x_fast*(Q_li+Q_spl))/(x_fast+1))-(W_li*C_li*kliab- y[17]*k_de)-y[7]*CLE_f;
+             // spleen
+             dydt[8] = ((x_fast*Q_spl)/(1+x_fast))*(C_art - C_spl/P) - (W_spl*C_spl*ksplab - y[18]*k_de);
+             // arterial blood
+             dydt[9] = Q_tot *((C_ven + x_re*C_lu/P)/(1+x_re)-C_art)- ((0.2*W_blood*C_art)*kbloodab-0.2*y[19]*k_de);
+             // venous blood
+             dydt[10] = C_li*x_fast*(Q_li+Q_spl)/(P*(1+x_fast)) +  Q_spl*x_fast*C_spl/(P*(1+x_fast)*(1+x_fast))+ (C_br*Q_br*x_br)/(P*(1+x_br)) + (C_ht*x_re*Q_ht)/(P*(1+x_re))+ (C_ki*Q_ki*x_re)/(P*(1+x_re))+ (C_bm*Q_bm*x_fast)/(P*(1+x_fast))+ (Q_re*C_re*x_re)/(P*(1+x_re))+(Q_li/(1+x_fast) +Q_spl/((1+x_fast)*(1+x_fast)) +Q_br/(1+x_br)+Q_ht/(1+x_re)+Q_ki*(1-CLE_u/Q_ki)/(1+x_re)+ Q_bm/(1+x_fast)+Q_re/(1+x_re))*C_art - Q_tot*C_ven - ((0.8*W_blood*C_ven)* kbloodab -0.8* y[19] * k_de);
+
+             // Nanoparticles uptaken in PCs
+             // lungs
+             dydt[11] = W_lu*C_lu*kluab - y[11]*k_de;
+             // rest of the body
+             dydt[12] = W_re*C_re*kreab - y[12]*k_de;
+             // bone marrow
+             dydt[13] = W_bm*C_bm*kbmab - y[13]*k_de;
+             // brain
+             dydt[14] = W_br*C_br*kbrab - y[14]*k_de;
+             // heart
+             dydt[15] = W_ht*C_ht*khtab - y[15]*k_de;
+             // kidneys
+             dydt[16] = W_ki*C_ki*kkiab - y[16]*k_de; 
+             // liver
+             dydt[17] = W_li*C_li*kliab - y[17]*k_de;
+             // spleen
+             dydt[18] = W_spl*C_spl*ksplab - y[18]*k_de;
+             // blood
+             dydt[19] = (0.2*W_blood*C_art + 0.8*W_blood*C_ven)*kbloodab - y[19]*k_de;
+
+             //Nanoparticles in excreta (CLE_f --> y[20], CLE_u --> y[21])
+             // Rate of amount in feces from liver - ug/h
+             dydt[20] = y[7]*CLE_f;
+             // Rate of amount in urine from kidney -ug/h
+             dydt[21] = C_art*CLE_u;
+            
+             return dydt;       
+
+        } 
 }
 //////////////////////////////////////////////////////////////////////////
         
 data{
                 
-        int<lower=0> N_subj;
-        int<lower=0> N_param;              
-        int<lower=0> N_compart;
-        int  N_obs;                 // Total number of observations
-        real  time[N_obs];
-        real  con[N_obs];
-        int   samp[N_subj];                   // Number of samples of each individual
-        real y0[N_compart];           // Initial concentration in compartments
+        int<lower=0> N_param;                 // Number of parameters to be estimated
+        int<lower=0> N_compart;               //number of observed compartments
+        int<lower=0> N_diff;              // number of differential equations
+        int<lower=0>  N_obs;                 // Total number of observations
+        real  time[6];
+        real  mass[6,6];
+        int   samp[N_compart];                   // Number of samples of each compartment
+        real m0[N_diff];           // Initial concentration in compartments
         real t_init;                  // Initial time
         real eta_tr[N_param];
-        real eta_tr_std[N_param];
-        real  params[41,N_subj];      // Matrix containing the individual parameters
-        real R;                       //
+        real  params[27];      // Matrix containing the individual parameters
         real rel_tol;
         real abs_tol;
         real max_num_steps;
-        real a;
 
 }
 
@@ -137,37 +186,35 @@ data{
 transformed data {
                 
         int idata[0];
+        vector[N_param]  eta_tr_std ; 
         vector[N_param]  eta_std ; 
         vector[N_param]  eta ;
-        cov_matrix [N_param] H;                //covariance matrix
+        vector [N_param] H;                //covariance matrix
+        
+
    
         for (i in 1:N_param){
+                eta_tr_std[i] = eta_tr[i];
                 eta_std[i]= sqrt(log(((eta_tr_std[i]^2)/(eta_tr[i])^2)+1));
                 eta[i]=log(((eta_tr[i])^2)/sqrt((eta_tr_std[i]^2)+(eta_tr[i])^2));
+                H[i] = eta_std[i];
         }
-                
-       for (i in 1:N_param){
-                for (j in 1:N_param){
-                                
-                        H[i,j]=0;
-                                
-                }
-        }
+        
+ 
+          
+   //print(solution);
+   //print(mass);
+   //print(time)
 
-        H[1,1] = eta_std[1]^2;
-        H[2,2] = eta_std[2]^2;
-        H[3,3] = eta_std[3]^2;
-                
 }
 //////////////////////////////////////////////////////////////////
         
 parameters{
- 
-        real<lower=0>  sigma;
-        vector[N_param] mu;
-        corr_matrix[N_param] C;
-        vector<lower=0>[N_param] s; // scales
-        vector [N_param] theta_tr[N_subj];
+                
+    real<lower=0>  sigma1;
+    real<lower=0>  sigma2;
+    vector [N_param] theta_tr;
+
                 
 }
 ////////////////////////////////////////////////////
@@ -179,40 +226,93 @@ transformed parameters{
         
 model{
 
-real y_hat[16,14];
-matrix[N_param,N_param] Omega;
-int pos;
+real m_hat[6,21];
+real total_m_hat[6,N_compart];
+real Wb_ki; real Wb_br; real Wb_lu; real Wb_li; real W_blood;real Wb_spl ;real Wb_ht; real Wb_bm ; real Wb_re;
+real W_lu; real W_br;real W_ki; real W_li; real W_spl;
+real C_art[6]; real C_ven[6]; real C_ki[6]; real C_br[6];real C_spl[6];real C_lu[6];real C_li[6];
+real x_re ; real x_fast;  real P; real fro;real frbr;  
+int pos; // uxiliary variable for segmentation
 pos = 1;
 
-//priors
- sigma ~ normal(0,1);
- mu ~ multi_normal(eta,H);
- C ~ lkj_corr(a); 
- s ~ normal(0,1);
- Omega = quad_form_diag(C, s);
 
+//priors
+ sigma1 ~ normal(0,10);
+ sigma2 ~ normal(0,50);
+
+ theta_tr[:] ~normal(eta[:],H[:]);
+ 
+ x_re = exp(theta_tr[11]);
+ x_fast = exp(theta_tr[10]);
+ P = exp(theta_tr[12]);
+ fro =  exp(theta_tr[18]);
+ frbr =  exp(theta_tr[17]);
+ W_lu = params[1];
+ W_br = params[3];
+ W_ki = params[5];
+ W_li = params[6];
+ W_spl =  params[7];
+ Wb_lu = params[9]; 
+ Wb_bm = params[10]; 
+ Wb_br = params[11];
+ Wb_ht = params[12]; 
+ Wb_ki = params[13]; 
+ Wb_li = params[14]; 
+ Wb_spl = params[15]; 
+ Wb_re = params[16]; 
+ W_blood = params[17]; 
  
  //likelihood~  
- 
-for (j in 1:N_subj){
 
-        theta_tr[j,:] ~ multi_normal(mu,Omega) ;
-       
-       y_hat[1:samp[j],:] = integrate_ode_bdf(pbpk,y0,t_init,segment(time, pos, samp[j]),
-                                                 to_array_1d(theta_tr[j,:]),params[:,j],idata,
+       m_hat[:,:] = integrate_ode_bdf(pbpk,m0,t_init, time,
+                                                 to_array_1d(theta_tr[:]),params[:],idata,
                                                  rel_tol, abs_tol,max_num_steps);
+       for (i in 1:6){
+         
+          C_lu[i] = m_hat[i,1]/W_lu;
+          C_br[i] = m_hat[i,4]/W_br;
+          C_ki[i] = m_hat[i,6]/W_ki;
+          C_li[i] = m_hat[i,7]/W_li;
+          C_spl[i] = m_hat[i,8]/W_spl;
+          C_art[i] = m_hat[i,9]/(0.2*(W_blood + Wb_spl + Wb_li + Wb_lu + Wb_br + Wb_ht + Wb_ki + 
+              Wb_bm +   Wb_re));
+          C_ven[i] =m_hat[i,10]/(0.8*(W_blood + Wb_spl + Wb_li + Wb_lu + Wb_br + Wb_ht + Wb_ki + 
+              Wb_bm + Wb_re));
 
-       log(segment(con, pos, samp[j])) ~ normal(log( to_vector(y_hat[1:samp[j],14])/R),sigma);
-       pos = pos + samp[j];
+                                      
+       // Total amount of NPs in each organ
+       // Amount in kidneys
+       total_m_hat[i,1] = m_hat[i,6] + m_hat[i,16] +  fro*(C_art[i]+x_re*C_ki[i]/P)/(1+x_re)*Wb_ki;
+       // Amount in brain
+       total_m_hat[i,2] = m_hat[i,4] + m_hat[i,14] + frbr*(C_art[i]+0*C_br[i]/P)/(1+0)*Wb_br;
+       // Amount in spleen
+       total_m_hat[i,3] = m_hat[i,8] + m_hat[i,18]+  fro*(C_art[i]+x_fast*C_spl[i]/P)/(1+x_fast)*Wb_spl;
+       // Amount in lungs
+       total_m_hat[i,4] = m_hat[i,1] + m_hat[i,11] +  fro*(C_ven[i]+x_re*C_lu[i]/P)/(1+x_re)*Wb_lu ;
+       // Amount in liver
+       total_m_hat[i,5] = m_hat[i,7] + m_hat[i,17]+  fro*(C_art[i]+x_fast*C_li[i]/P)/(1+x_fast)*Wb_li;
+       // Amount in blood
+       total_m_hat[i,6] = m_hat[i,9]+m_hat[i,10]+m_hat[i,19];
+       }
+    
 
-}
+       for (j in 1:N_compart){
+         if (j == 1 || j==2 || j==4 || j==6){
+           //log(mass[i,j]) ~ normal(log(total_m_hat[i,j]+1e-15),sigma);
+             to_vector(mass[:,j]) ~ normal(to_vector(total_m_hat[:,j]),sigma1);
+         } else{
+             to_vector(mass[:,j]) ~ normal(to_vector(total_m_hat[:,j]),sigma2);
+
+         }
+         
+       }
 
 }
 
 
 generated quantities{
+      vector [N_param] theta;
+      theta = exp(theta_tr);
 
-  matrix[N_param,N_param] Omega;
 
-         Omega = quad_form_diag(C, s);
 }
