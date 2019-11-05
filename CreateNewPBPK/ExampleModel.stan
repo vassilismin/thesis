@@ -228,10 +228,12 @@ model{
 
 real m_hat[6,21];
 real total_m_hat[6,N_compart];
+//svise apo edw
 real Wb_ki; real Wb_br; real Wb_lu; real Wb_li; real W_blood;real Wb_spl ;real Wb_ht; real Wb_bm ; real Wb_re;
 real W_lu; real W_br;real W_ki; real W_li; real W_spl;
 real C_art[6]; real C_ven[6]; real C_ki[6]; real C_br[6];real C_spl[6];real C_lu[6];real C_li[6];
 real x_re ; real x_fast;  real P; real fro;real frbr;  
+//mexri edw
 int pos; // uxiliary variable for segmentation
 pos = 1;
 
@@ -242,6 +244,7 @@ pos = 1;
 
  theta_tr[:] ~normal(eta[:],H[:]);
  
+ //svise apo edw
  x_re = exp(theta_tr[11]);
  x_fast = exp(theta_tr[10]);
  P = exp(theta_tr[12]);
@@ -260,7 +263,8 @@ pos = 1;
  Wb_li = params[14]; 
  Wb_spl = params[15]; 
  Wb_re = params[16]; 
- W_blood = params[17]; 
+ W_blood = params[17];
+ //mexri edw
  
  //likelihood~  
 
@@ -268,7 +272,7 @@ pos = 1;
                                                  to_array_1d(theta_tr[:]),params[:],idata,
                                                  rel_tol, abs_tol,max_num_steps);
        for (i in 1:6){
-         
+           // svise edw
           C_lu[i] = m_hat[i,1]/W_lu;
           C_br[i] = m_hat[i,4]/W_br;
           C_ki[i] = m_hat[i,6]/W_ki;
@@ -278,10 +282,12 @@ pos = 1;
               Wb_bm +   Wb_re));
           C_ven[i] =m_hat[i,10]/(0.8*(W_blood + Wb_spl + Wb_li + Wb_lu + Wb_br + Wb_ht + Wb_ki + 
               Wb_bm + Wb_re));
-
+        //mexri edw
                                       
        // Total amount of NPs in each organ
        // Amount in kidneys
+       
+       //svise apo to fro kai meta 
        total_m_hat[i,1] = m_hat[i,6] + m_hat[i,16] +  fro*(C_art[i]+x_re*C_ki[i]/P)/(1+x_re)*Wb_ki;
        // Amount in brain
        total_m_hat[i,2] = m_hat[i,4] + m_hat[i,14] + frbr*(C_art[i]+0*C_br[i]/P)/(1+0)*Wb_br;
