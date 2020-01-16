@@ -201,6 +201,6 @@ func <- function(time=0, inits, params){
 
 ###########
 sample_time <- c(0, 10/(60*24), 1/24, 1, 7, 28, 56) #in days
-solution <- ode(times = sample_time, func = func, y = inits, parms = params, method = "lsodes" )
+solution <- ode(times = sample_time, func = func, y = inits, parms = params, method = "bdf" )
 
 solution
