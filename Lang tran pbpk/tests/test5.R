@@ -1,3 +1,5 @@
+# Test xrhsimopoiontas prosdiorizontas Jacobian matrix me vash to test 3
+
 ###### 1)Sto script xrisimopoiountai autousies oi exisoseis tou Tran kathos kai oi times tvn parametron. Ginetai elegxos ton exiseon me deSolve
 ###### 2)Allagh stis diaforikes gia ta tissues: prosthiki tvn lambda...2 ston oro eisodou
 
@@ -111,8 +113,47 @@ ode.func <- function(time, inits, params){
     
   })}
 
+###################
+# Jacobian Matrix #
+###################
+
+jacobian_matrix <- function(time, inits, params) {
+  matrix(nrow = 30, ncol = 30, byrow = TRUE, data = c(
+    c(-ko-kB, rep(0, 29)),  #df1
+    c(0, -ku, rep(0, 28)),  #df2
+    c(rep(0,2), -kr-ki, kd, rep(0,26)),  #df3
+    c(rep(0,2), kr, -kd-kt, rep(0,26)),  #df4
+    c(rep(0,2), ki, 0, kl-kb, rep(0,24), lambdaI*lambdav*QTotal/Vven),  #df5
+    c(rep(0,4), kl, rep(0,25)),  #df6
+    c(rep(0,6), -(Q[1]/Vcap[1])*(1+lambda3[2]+lambda3[5]),  (Q[1]/Vtis[1])*lambda3[1], 0, (Q[2]/Vcap[2])*lambda4[5], rep(0,18), Q[1]/Vart, 0),  #df7
+    c(rep(0,6), (Q[1]/Vcap[1])*lambda3[2], (Q[1]*lambda3[1]/Vtis[1]) - lambda3[3], rep(0,22)),  #df8
+    c(rep(0,7), lambda3[3], rep(0,22)),  #df9
+    c(rep(0,6), Q[1]*lambda3[5]/Vcap[1], rep(0,2), -(Q[2]/Vcap[2])*(1+lambda4[5]), Q[2]*lambda4[1]/Vtis[2], rep(0,17), Q[2]/Vart, 0),  #df10
+    c(rep(0,9), Q[2]*lambda4[5]/Vcap[2], -Q[2]*lambda4[1]/Vtis[2] - lambda4[3], 0, lambda4[6], rep(0,17)),  #df11
+    c(rep(0,10), lambda4[3], rep(0,19)),  #df12
+    c(fo*ko, fu*ku, 0, ft*kt, rep(0,8), -lambda4[6]-lambda4[4], rep(0,17)),  #df13
+    c(rep(0,14), -(Q[3]/Vcap[3])*(1+lambda5[2]) - lambda5[4], Q[3]*lambda5[1]/Vtis[3], rep(0,13), Q[3]/Vart, 0),  #df14
+    c(rep(0,13), Q[3]*lambda5[2]/Vcap[3], -Q[3]*lambda5[1]/Vtis[3] - lambda5[3], rep(0,15)),  #df15
+    c(rep(0,14), lambda5[3], rep(0,15)),  #df16
+    c(rep(0,16), -(Q[4]/Vcap[4])*(1+lambda6[2]), Q[4]*lambda6[1]/Vtis[4], rep(0,10), Q[4]/Vart, 0),  #df17
+    c(rep(0,16), -Q[4]*lambda6[1]/Vtis[4] - lambda6[3], rep(0,12)),  #df18
+    c(rep(0,17), lambda6[3], rep(0,12)),  #df19
+    c(rep(0,19), -Q[5]*(1+lambda7[2])/Vcap[5], Q[5]*lambda7[1]/Vtis[5], rep(0,7), Q[5]/Vart, 0), #df20
+    c(rep(0,19), Q[5]*lambda7[2]/Vcap[5], -Q[5]*lambda7[1]/Vtis[5] - lambda7[3], rep(0,9)),  #df21
+    c(rep(0,20), lambda7[3], rep(0,9)),  #df22
+    c(rep(0,22), Q[6]*(1+lambda8[2])/Vcap[6], Q[6]*lambda8[1]/Vtis[6], 0, Q[6]/Vart, rep(0,4)),  #df23
+    c(kB, rep(0,21), Q[6]*lambda8[2]/Vcap[6], -Q[6]*lambda8[1]/Vtis[6] - lambda8[3], rep(0,6)),  #df24
+    c(rep(0,23), lambda8[3], rep(0,6)),  #df25
+    c(rep(0,25), -Q[7]*(1+lambda9[2])/Vcap[7], Q[7]*lambda9[1], 0, Q[7]/Vart, 0),  #df26
+    c(rep(0,25), Q[7]*lambda9[2]/Vcap[7], -Q[7]*lambda9[1]/Vtis[7] - lambda9[3], rep(0,3)),  #df27
+    c(lambda9[3]),  #df28
+    c(rep(0,4),kb,rep(0,23), -QTotal/Vart, 0),  #df29
+    c(rep(0,6), Q[1]/Vcap[1], rep(0,6), Q[3]/Vcap[3], rep(0,2), Q[4]/Vcap[4], rep(0,2), Q[5]/Vcap[5], rep(0,9), -QTotal*lambdaI/Vven)
+  ))
+}
+
 sample_time <- c(0, 1, 14, 28) #in days
 #sample_time <- seq(0,1,0.01)
-solution <- ode(times = sample_time, func = ode.func, y = inits, parms = params, method = "bdf")
+solution <- ode(times = sample_time, func = ode.func, y = inits, parms = params, method = "bdf", jacfunc = jacobian_matrix)#, jactype = "fullusr")
 
 solution

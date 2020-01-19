@@ -21,8 +21,8 @@ Du <- 0
 Do <- 0
 Vven <- 5.6 
 Vart <- 11.3
-lambda3 <- c(0.09,0.0001,0.01,0)
-lambda4 <- c(1,0,0.29185,0.5,0.9)
+lambda3 <- c(0.09,0.0001,0.01,0, 0.4997)  #lambda3[5] taken from code for semmler
+lambda4 <- c(1,0,0.29185,0.5,0.9, 0,8530) #lambda4[6] taken from code for semmler
 lambda5 <- c(0.9,0.05,0.09,0.0)
 lambda6 <- c(0.07,0.9,0.003)
 lambda7 <- c(0.08,0.003,0.08)
@@ -110,6 +110,6 @@ return(list(c(dE[1] , dE[2], dE[3], dE[4], dE[5], dE[6], dE[7], dE[8], dE[9], dE
 
 sample_time <- c(0, 1, 14, 28) #in days
 #sample_time <- seq(0,1,0.01)
-solution <- ode(times = sample_time, func = ode.func, y = inits, parms = params, method = "bdf")
+solution <- ode(times = sample_time, func = ode.func, y = inits, parms = params, method = "lsodes")
 
 solution
