@@ -1,6 +1,10 @@
 setwd("C:\\Users\\vassi\\Documents\\Diploma Thesis\\Li_model_tests\\Sensitivity analysis")
-results <- matrix(0, nrow = 21, ncol = 16)
+options(max.print=1000000)
+
+#results <- matrix(0, nrow = 21, ncol = 16)
 Dx <- 1.2   # to pososto metavolis ton parametron
+ar <- array(0, c(6, 21, 16))
+ar2 <- array(0, c(6, 16, 21))
 
 
 ###Epanaliptiki diadikasia ypologismou apotelesmaton gia kathe nea parametro
@@ -108,36 +112,122 @@ params <- c(M_lu_cap, M_bm_cap, M_br_cap, M_ht_cap, M_ki_cap, M_li_cap, M_spl_ca
   
   source("Li-equations.R")     # epilisi toy montelou gia ti nea timi tis parametrou i
 
-  solution <- solution[2,2:22] # kratao ta apotelesmata mono gia 1 xroniki stigmh epilisis kai petao ta ipoloipa apotelesmata kathos kai tin timi tou xronou oloklirosis
+  #solution <- solution[2,2:22] # kratao ta apotelesmata mono gia 1 xroniki stigmh epilisis kai petao ta ipoloipa apotelesmata kathos kai tin timi tou xronou oloklirosis
+  #results[,i] <- solution
   
-  
-  results[,i] <- solution
+  ar[,,i] <- solution[,2:22] #dimiourgia 3d array (6x21x16), diladi ta apotelesmata twn 21 diaforikwn se 6 xronikes stigmes epilisis gia metavoli se kathe mia apo tis 16 parametrous
   
 }
 
-#results
+###Metatropi tou pinaka ar se diastaseis 6x16x21
+for (z in 1:16) {
+  for (w in 1:21) {
+      ar2[,z,w] <- ar[,w,z]  
+      }
+} 
+
+#ar2
 
 ###Ypologismos apotelesmaton xoris kapoia metavoli stis parametrous
 params <- init_params
 source("Li-equations.R")          # epilisi toy montelou gia ti arxikes times ton parametron
-init_solution <- solution[2,2:22] # kratao ta apotelesmata mono gia 1 xroniki stigmh epilisis kai petao ta ipoloipa apotelesmata kathos kai tin timi tou xronou oloklirosis
-
+init_solution <- solution[,2:22] # kratao ta apotelesmata mono gia oles tis xronikes stigmes epilisis
 
 ###Ypologismos metavolis twn diaforikwn dydt ws pros tin metavoli tis parametrou poy elegxetai
-for (y in 1:16) {
-  for (x in 1:21) {
-  results[x,y] <- abs((results[x,y] - init_solution[x]))/(Dx*params[y])     
-  }
-  
+results <- array(0, c(6, 16, 21)) 
+for (w in 1:21) {      ### deiktis diamerismatos
+    for (t in 1:6) {   ### deiktis xronikis stigmis
+      results[t,,w] <- abs(ar2[t,,w]-init_solution[t,w])
+      }
 }
 
-
-results
+for (p in 1:16) { # opou p --> deiktis gia kathe allagmeni parametro
+  results[,p,] <- results[,p,]/(Dx*params[p])
+}
+#results
 
 
 ###Sensitivity Index (SI) calculation
-SI <- matrix(0, nrow = 21, ncol = 16)
+#SI <- matrix(0, nrow = 21, ncol = 16)
+SI <- array(0, c(6, 16, 21))
+eps <- 1e-10
 for (k in 1:21) {
-  SI[k,] <- results[k,]/init_solution[k]
+  for (t in 1:6) {
+    SI[t,,k] <- results[t,,k]/(init_solution[t,k]+eps)
+  }
 }
-SI
+#SI
+
+
+#Dimiourgia data frame gia kathe diamerisma gia ta SI olon ton parametrwn      ## Nanoparticles in tissue
+data_comp1 <- as.data.frame(rbind(cbind(sample_time, SI[,,1])))                # lungs
+data_comp2 <- as.data.frame(rbind(cbind(sample_time, SI[,,2])))                # rest of body
+data_comp3 <- as.data.frame(rbind(cbind(sample_time, SI[,,3])))                # bone marrow
+data_comp4 <- as.data.frame(rbind(cbind(sample_time, SI[,,4])))                # brain
+data_comp5 <- as.data.frame(rbind(cbind(sample_time, SI[,,5])))                # heart
+data_comp6 <- as.data.frame(rbind(cbind(sample_time, SI[,,6])))                # kidneys
+data_comp7 <- as.data.frame(rbind(cbind(sample_time, SI[,,7])))                # liver
+data_comp8 <- as.data.frame(rbind(cbind(sample_time, SI[,,8])))                # spleen
+data_comp9 <- as.data.frame(rbind(cbind(sample_time, SI[,,9])))                # arterial blood
+data_comp10 <- as.data.frame(rbind(cbind(sample_time, SI[,,10])))              # venous blood
+
+                                                                               ## Nanoparticles uptaken in PCs
+data_comp11 <- as.data.frame(rbind(cbind(sample_time, SI[,,11])))              # lungs
+data_comp12 <- as.data.frame(rbind(cbind(sample_time, SI[,,12])))              # rest of the body
+data_comp13 <- as.data.frame(rbind(cbind(sample_time, SI[,,13])))              # bone marrow
+data_comp14 <- as.data.frame(rbind(cbind(sample_time, SI[,,14])))              # brain
+data_comp15 <- as.data.frame(rbind(cbind(sample_time, SI[,,15])))              # heart
+data_comp16 <- as.data.frame(rbind(cbind(sample_time, SI[,,16])))              # kidneys
+data_comp17 <- as.data.frame(rbind(cbind(sample_time, SI[,,17])))              # liver
+data_comp18 <- as.data.frame(rbind(cbind(sample_time, SI[,,18])))              # spleen
+data_comp19 <- as.data.frame(rbind(cbind(sample_time, SI[,,19])))              # blood
+data_comp20 <- as.data.frame(rbind(cbind(sample_time, SI[,,20])))              #feces
+data_comp21 <- as.data.frame(rbind(cbind(sample_time, SI[,,21])))              #urine
+
+colnames(data_comp1) <- c("Time", "M_lu_cap", "M_bm_cap", "M_br_cap", "M_ht_cap", "M_ki_cap", "M_li_cap", "M_spl_cap", "M_blood_cap", "M_re_cap", "x_fast", "x_re", "P", "k_ab0", "k_ab0_spl", "k_de", "CLE_f")
+colnames(data_comp2) <- colnames(data_comp1)
+colnames(data_comp3) <- colnames(data_comp1)
+colnames(data_comp4) <- colnames(data_comp1)
+colnames(data_comp5) <- colnames(data_comp1)
+colnames(data_comp6) <- colnames(data_comp1)
+colnames(data_comp7) <- colnames(data_comp1)
+colnames(data_comp8) <- colnames(data_comp1)
+colnames(data_comp9) <- colnames(data_comp1)
+colnames(data_comp10) <- colnames(data_comp1)
+colnames(data_comp11) <- colnames(data_comp1)
+colnames(data_comp12) <- colnames(data_comp1)
+colnames(data_comp13) <- colnames(data_comp1)
+colnames(data_comp14) <- colnames(data_comp1)
+colnames(data_comp15) <- colnames(data_comp1)
+colnames(data_comp16) <- colnames(data_comp1)
+colnames(data_comp17) <- colnames(data_comp1)
+colnames(data_comp18) <- colnames(data_comp1)
+colnames(data_comp19) <- colnames(data_comp1)
+colnames(data_comp20) <- colnames(data_comp1)
+colnames(data_comp21) <- colnames(data_comp1)
+
+
+ggplot(data_comp1, aes(x=Time)) +
+  geom_point(data = data_comp1, aes(x=Time, y=M_lu_cap, color = "M_lu_cap"),  size = 3) +
+  geom_point(data = data_comp1, aes(x=Time, y=M_bm_cap, color = "M_bm_cap"),  size = 3) +
+  geom_point(data = data_comp1, aes(x=Time, y=M_br_cap,  color = "M_br_cap"),  size = 3) +
+  geom_point(data = data_comp1, aes(x=Time, y=M_ht_cap,  color = "M_ht_cap"),  size = 3) +
+  geom_point(data = data_comp1, aes(x=Time, y=M_ki_cap,  color = "M_ki_cap"),  size = 3) +
+  geom_point(data = data_comp1, aes(x=Time, y=M_li_cap,  color = "M_li_cap"),  size = 3) +
+  geom_point(data = data_comp1, aes(x=Time, y=M_spl_cap,  color = "M_spl_cap"),  size = 3) +
+  geom_point(data = data_comp1, aes(x=Time, y=M_blood_cap,  color = "M_blood_cap"),  size = 3) +
+  geom_point(data = data_comp1, aes(x=Time, y=M_re_cap,  color = "M_re_cap"),  size = 3) +
+  geom_point(data = data_comp1, aes(x=Time, y=x_fast,  color = "x_fast"),  size = 3) +
+  geom_point(data = data_comp1, aes(x=Time, y=x_re,  color = "x_re"),  size = 3) +
+  geom_point(data = data_comp1, aes(x=Time, y=P,  color = "P"),  size = 3) +
+  geom_point(data = data_comp1, aes(x=Time, y=k_ab0,  color = "k_ab0"),  size = 3) +
+  geom_point(data = data_comp1, aes(x=Time, y=k_ab0_spl,  color = "k_ab0_spl"),  size = 3) +
+  #geom_point(data = data_comp1, aes(x=Time, y=k_de, color = "k_de"),  size = 3) +
+  geom_point(data = data_comp1, aes(x=Time, y=CLE_f, color = "CLE_f"),  size = 3) +
+  
+  labs(title = "SI vs Time", subtitle = "Lungs compartment", y = "SI", x = "Time (in minutes)") +
+  scale_colour_manual(name = "Parameters",
+                     breaks = c("M_lu_cap", "M_bm_cap", "M_br_cap", "M_ht_cap", "M_ki_cap", "M_li_cap", "M_spl_cap", "M_blood_cap", "M_re_cap", "x_fast", "x_re", "P", "k_ab0", "k_ab0_spl",  "CLE_f"),
+                     values = c("grey", "red", "royalblue", "pink", "navy", "maroon", "orange", "yellow", "violetred", "rosybrown", "khaki", "hotpink", "cyan", "salmon", "black")) +
+  theme(legend.title=element_text(hjust = 0.5,size=17), 
+        legend.text=element_text(size=14))

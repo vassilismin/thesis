@@ -1,8 +1,8 @@
 library(deSolve)
+library(ggplot2)
 dose <- 1.7e03 #micro grams
 y <- c(rep(0,9),dose, rep(0,11))
 inits <- as.vector(y)
-
 
 
   ode.func <- function(time, y, params){
@@ -96,5 +96,13 @@ inits <- as.vector(y)
   
   solution <- ode(times = sample_time, func = ode.func, y = inits, parms = params, method = "lsodes")
 
-  #as.vector(solution)
   
+  for (x in 1:6) {
+    for (y in 1:21) {
+      if (solution[x,y] < 0){
+        solution[x,y] <- 0
+      }
+    }
+  }
+  #solution
+  rowSums(solution[,2:dim(solution)[2]])
