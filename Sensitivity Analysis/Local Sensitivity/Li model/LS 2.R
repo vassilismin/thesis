@@ -1,7 +1,7 @@
 setwd("C:\\Users\\vassi\\Documents\\Diploma Thesis\\Li_model_tests\\Sensitivity analysis")
 options(max.print=1000000)
+library(ggplot2)
 
-#results <- matrix(0, nrow = 21, ncol = 16)
 Dx <- 1.2   # to pososto metavolis ton parametron
 ar <- array(0, c(6, 21, 16))
 ar2 <- array(0, c(6, 16, 21))
@@ -112,9 +112,6 @@ params <- c(M_lu_cap, M_bm_cap, M_br_cap, M_ht_cap, M_ki_cap, M_li_cap, M_spl_ca
   
   source("Li-equations.R")     # epilisi toy montelou gia ti nea timi tis parametrou i
 
-  #solution <- solution[2,2:22] # kratao ta apotelesmata mono gia 1 xroniki stigmh epilisis kai petao ta ipoloipa apotelesmata kathos kai tin timi tou xronou oloklirosis
-  #results[,i] <- solution
-  
   ar[,,i] <- solution[,2:22] #dimiourgia 3d array (6x21x16), diladi ta apotelesmata twn 21 diaforikwn se 6 xronikes stigmes epilisis gia metavoli se kathe mia apo tis 16 parametrous
   
 }
@@ -130,8 +127,33 @@ for (z in 1:16) {
 
 ###Ypologismos apotelesmaton xoris kapoia metavoli stis parametrous
 params <- init_params
+
+for (i in 1:16) {
+  #Sto parakato kommati ginetai antistoixisi twn newn timwn twn parametrwn me tis antistoixes onomasies tous 
+  M_lu_cap <- params[1] # maximum phagocytizing cells uptake per lung weight, fitted value - ug/g
+  M_bm_cap <- params[2] # maximum phagocytizing cells uptake per bone marrow weight, fitted value - ug/g
+  M_br_cap <- params[3] # maximum phagocytizing cells uptake per brain weight, fitted value - ug/g
+  M_ht_cap <- params[4] # maximum phagocytizing cells uptake per heart weight, fitted value - ug/g
+  M_ki_cap <- params[5] # maximum phagocytizing cells uptake per kidney weight, fitted value - ug/g
+  M_li_cap <- params[6] # maximum phagocytizing cells uptake per liver weight, fitted value - ug/g  
+  M_spl_cap <- params[7] # maximum phagocytizing cells uptake per spleen weight, fitted value - ug/g
+  M_blood_cap <- params[8] # maximum phagocytizing cells uptake per blood weight, fitted value - ug/g
+  M_re_cap <- params[9] # maximum phagocytizing cells uptake per slowly perfused tissue weight, fitted value - ug/g
+  
+  x_fast <- params[10] # permeability coefficient from blood to fast perfused tissue, fitted value - unitless
+  x_re <- params[11] # permeability coefficient from blood to rest of the body, fitted value - unitless
+  P <- params[12] # partition coefficient tissue:blood, fitted value - unitless
+  k_ab0 <- params[13] # maximum uptake rate by phagocytizing cells, fitted value - 1/h
+  k_ab0_spl  <- params[14] # maximum uptake rate by phagocytizing cells in spleen, fitted value - 1/h
+  k_de <- params[15] # desorption rate by phagocytizing cells, fitted value - 1/h   
+  CLE_f <-  params[16]
+  
+}
+
 source("Li-equations.R")          # epilisi toy montelou gia ti arxikes times ton parametron
 init_solution <- solution[,2:22] # kratao ta apotelesmata mono gia oles tis xronikes stigmes epilisis
+
+
 
 ###Ypologismos metavolis twn diaforikwn dydt ws pros tin metavoli tis parametrou poy elegxetai
 results <- array(0, c(6, 16, 21)) 
@@ -148,7 +170,6 @@ for (p in 1:16) { # opou p --> deiktis gia kathe allagmeni parametro
 
 
 ###Sensitivity Index (SI) calculation
-#SI <- matrix(0, nrow = 21, ncol = 16)
 SI <- array(0, c(6, 16, 21))
 eps <- 1e-10
 for (k in 1:21) {
