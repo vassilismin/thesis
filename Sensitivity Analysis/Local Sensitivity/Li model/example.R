@@ -149,7 +149,7 @@ colnames(data_comp5) <- colnames(data_comp1)
 colnames(data_comp6) <- colnames(data_comp1)
 
 bag_of_data <- list(data_comp1,data_comp2,data_comp3, data_comp4, data_comp5, data_comp6)
-comp_names <- ("Lungs", "brain", "kidneys", "liver", "spleen", "blood")
+comp_names <- c("Lungs", "brain", "kidneys", "liver", "spleen", "blood")
 counter <-1
 
 for(dat in bag_of_data){
