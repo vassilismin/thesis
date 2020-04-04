@@ -1,5 +1,3 @@
-library(deSolve)
-library(ggplot2)
 dose <- 1.7e03 #micro grams
 y <- c(rep(0,9),dose, rep(0,11))
 inits <- as.vector(y)
@@ -104,5 +102,36 @@ inits <- as.vector(y)
       }
     }
   }
+  
+  
+  Total_amount <- matrix(0, nrow = 6, ncol = 6)
+  
+  for (t in 1:6) { # t->time indice 
+  ###Total amount of NPs in each organ
+  
+  # Amount in Lungs
+  Total_amount[t,1] <- solution[t,2] + solution[t,12]
+  
+  # Amount in Brain
+  Total_amount[t,2] <- solution[t,5] + solution[t,15]
+  
+  # Amount in Kidneys
+  Total_amount[t,3] <- solution[t,7] + solution[t,17]
+  
+  # Amount in Liver
+  Total_amount[t,4] <- solution[t,8] + solution[t,18]
+  
+  # Amount in Spleen
+  Total_amount[t,5] <- solution[t,9] + solution[t,19]
+  
+  # Amount in Blood
+  Total_amount[t,6] <- solution[t,10] +solution[t,11] + solution[t,20]
+  }
+  
+  
+  
+  
+  
+  
   #solution
-  rowSums(solution[,2:dim(solution)[2]])
+  #rowSums(solution[,2:dim(solution)[2]])

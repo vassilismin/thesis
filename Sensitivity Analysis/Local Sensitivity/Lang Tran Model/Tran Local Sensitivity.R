@@ -1,14 +1,13 @@
 setwd("C:\\Users\\vassi\\Documents\\Diploma Thesis\\Lang Tran Files\\Sensitivity Analysis\\Local Sensitivity")
 options(max.print=1000000)
+library(deSolve)
 library(ggplot2)
 
-Dx <- 1.2   # to pososto metavolis ton parametron
-ar <- array(0, c(4, 32, 37))  #4 xronikes stigmes epilisis, 32 diaforikes, 37 parametroi pros analisi 
-ar2 <- array(0, c(4, 37, 32))
-
-
-###Epanaliptiki diadikasia ypologismou apotelesmaton gia kathe nea parametro
-for (i in 1:37) {
+init <- 1
+Dx <- 0.2   # to pososto metavolis ton parametron
+mult <- init + Dx
+ar <- array(0, c(6, 6, 37))  # 6 xronikes stigmes epilisis, 6 diamerismata, 37 parametroi pros analisi 
+ar2 <- array(0, c(6, 37, 6))
 
   ##############
   # Parameters #
@@ -83,8 +82,20 @@ for (i in 1:37) {
   params <- c(lambda3[], lambda4[], lambda5[], lambda6[], lambda7[], lambda8[], lambda9[], k_B, kb, ko, ku, kt, kr, kd, ki, kl, lambdaI, # se autes ginetai sensitivity analysis
               Vtis[],Vcap[], Q[], QTotal, Da, Do, Du, Vven, Vart)
   
-  init_params <- params        # xrisimopoieitai pio kato gia ton ypologismo arxikon apotelesmaton xoris kapoia metavoli stis parametrous
-  params[i] <- Dx*params[i]    # epivoli metavolis tis parametrou i kata Dx (oristike stin arxi) 
+  
+  source("Tran_Equations.R")          # epilisi toy montelou gia ti arxikes times ton parametron
+  init_solution <- Total_amount
+  
+  init_params <- params        # arxikes times parametrwn
+  
+  
+  
+  
+  
+  
+  ###Epanaliptiki diadikasia ypologismou apotelesmaton gia kathe nea parametro
+  for (i in 1:37) {
+  params[i] <- mult*params[i]    # epivoli metavolis tis parametrou i kata mult 
   
   ###Sto parakato kommati ginetai antistoixisi twn newn timwn twn parametrwn me tis antistoixes onomasies tous
   if (i <=5){
@@ -116,117 +127,36 @@ for (i in 1:37) {
   
   source("Tran_Equations.R")   # epilisi toy montelou gia ti nea timi tis parametrou i
   
-  ar[,,i] <- solution[,2:33]   #dimiourgia 3d array (4x32x37), diladi ta apotelesmata twn 32 diaforikwn se 4 xronikes stigmes epilisis 
+  ar[,,i] <- Total_amount   #dimiourgia 3d array (6x6x37), diladi ta apotelesmata twn 6 diamerismatwn se 6 xronikes stigmes epilisis 
                                #gia metavoli se kathe mia apo tis 37 parametrous
-  
+  params <- init_params 
 }
 
-###Metatropi tou pinaka ar se diastaseis 4x37x32
+###Metatropi tou pinaka ar se diastaseis 6x37x6
 for (z in 1:37) {
-  for (w in 1:32) {
+  for (w in 1:6) {
     ar2[,z,w] <- ar[,w,z]
   }
   
 }
-ar2
-
-
-
-
-###Ypologismos apotelesmaton xoris kapoia metavoli stis parametrous
-params <- init_params
-for (i in 1:37) {
-  
-  if (i <=5){
-  lambda3[i] = params[i]
-} else if ((i>=6) &  (i<=11)){
-  lambda4[i-5] = params[i]
-} else if ((i>=12) & (i<=15)){
-  lambda5[i-11] = params[i]
-} else if ((i>=16) & (i<=18)){
-  lambda6[i-15] = params[i]
-} else if ((i>=19) & (i<=21)){
-  lambda7[i-18] = params[i]
-} else if ((i>=22) & (i<=24)){
-  lambda8[i-21] = params[i]
-} else if ((i>=25) & (i<= 27)){
-  lambda9[i-24] = params[i]
-}
-
-k_B <- params[28]
-kb <- params[29]
-ko <- params[30]
-ku <- params[31]
-kt <- params[32]
-kr <- params[33]
-kd <- params[34]
-ki <- params[35]
-kl <- params[36]
-lambdaI <- params[37]
-}
-
-source("Tran_Equations.R")          # epilisi toy montelou gia ti arxikes times ton parametron
-init_solution <- solution[,2:33]
-
-
-###Ypologismos metavolis twn diaforikwn dydt ws pros tin metavoli tis parametrou poy elegxetai
-results <- array(0, c(4,37,32))
-for (w in 1:32) {     ###deiktis diamerismatos
-  for (t in 1:4) {    ###deiktis xronikis stigmis
-    results[t,,w] <- abs(ar2[t,,w] - init_solution[t,w])
+  ###Sensitivity Index (SI) calculation
+  eps <- 1e-15
+  SI <- array(0, c(6, 37, 6)) 
+  for (w in 1:6) {      ### deiktis diamerismatos
+    for (t in 1:6) {   ### deiktis xronikis stigmis
+      for (p in 1:37){
+        SI[t,p,w] <- (abs(ar2[t,p,w]-init_solution[t,w]) / (Dx*init_params[p] + eps)) /(init_solution[t,w] + eps)
+      }
+    }	
   }
-}
-eps <- 1e-10
-for (p in 1:37) {     # opou p --> deiktis gia kathe allagmeni parametro
-  results[,p,] <- results[,p,]/(Dx*(params[p]+eps))
-}
-#results
 
-
-###Sensitivity Index (SI) calculation
-SI <- array(0, c(4,37,32))
-for (k in 1:32) {
-  for (t in 1:4) {
-    SI[t,,k] <- results[t,,k]/(init_solution[t,k]+eps)
-    
-  }
-}
-#SI
-
-
-#Dimiourgia data frame gia kathe diamerisma gia ta SI olon ton parametrwn
-data_comp1 <- as.data.frame(rbind(cbind(sample_time, SI[,,1])))                #
-data_comp2 <- as.data.frame(rbind(cbind(sample_time, SI[,,2])))                # 
-data_comp3 <- as.data.frame(rbind(cbind(sample_time, SI[,,3])))                # 
-data_comp4 <- as.data.frame(rbind(cbind(sample_time, SI[,,4])))                # 
-data_comp5 <- as.data.frame(rbind(cbind(sample_time, SI[,,5])))                # 
-data_comp6 <- as.data.frame(rbind(cbind(sample_time, SI[,,6])))                # 
-data_comp7 <- as.data.frame(rbind(cbind(sample_time, SI[,,7])))                # 
-data_comp8 <- as.data.frame(rbind(cbind(sample_time, SI[,,8])))                # 
-data_comp9 <- as.data.frame(rbind(cbind(sample_time, SI[,,9])))                # 
-data_comp10 <- as.data.frame(rbind(cbind(sample_time, SI[,,10])))              # 
-data_comp11 <- as.data.frame(rbind(cbind(sample_time, SI[,,11])))              # 
-data_comp12 <- as.data.frame(rbind(cbind(sample_time, SI[,,12])))              # 
-data_comp13 <- as.data.frame(rbind(cbind(sample_time, SI[,,13])))              # 
-data_comp14 <- as.data.frame(rbind(cbind(sample_time, SI[,,14])))              # 
-data_comp15 <- as.data.frame(rbind(cbind(sample_time, SI[,,15])))              # 
-data_comp16 <- as.data.frame(rbind(cbind(sample_time, SI[,,16])))              # 
-data_comp17 <- as.data.frame(rbind(cbind(sample_time, SI[,,17])))              # 
-data_comp18 <- as.data.frame(rbind(cbind(sample_time, SI[,,18])))              # 
-data_comp19 <- as.data.frame(rbind(cbind(sample_time, SI[,,19])))              # 
-data_comp20 <- as.data.frame(rbind(cbind(sample_time, SI[,,20])))              #
-data_comp21 <- as.data.frame(rbind(cbind(sample_time, SI[,,21])))              #
-data_comp22 <- as.data.frame(rbind(cbind(sample_time, SI[,,22])))              # 
-data_comp23 <- as.data.frame(rbind(cbind(sample_time, SI[,,23])))              # 
-data_comp24 <- as.data.frame(rbind(cbind(sample_time, SI[,,24])))              # 
-data_comp25 <- as.data.frame(rbind(cbind(sample_time, SI[,,25])))              # 
-data_comp26 <- as.data.frame(rbind(cbind(sample_time, SI[,,26])))              # 
-data_comp27 <- as.data.frame(rbind(cbind(sample_time, SI[,,27])))              # 
-data_comp28 <- as.data.frame(rbind(cbind(sample_time, SI[,,28])))              # 
-data_comp29 <- as.data.frame(rbind(cbind(sample_time, SI[,,29])))              # 
-data_comp30 <- as.data.frame(rbind(cbind(sample_time, SI[,,30])))              # 
-data_comp31 <- as.data.frame(rbind(cbind(sample_time, SI[,,31])))              # 
-data_comp32 <- as.data.frame(rbind(cbind(sample_time, SI[,,32])))              # 
+  #Dimiourgia data frame gia kathe diamerisma gia ta SI olon ton parametrwn      
+  data_comp1 <- as.data.frame( cbind(sample_time, SI[,,1]))              # Total amount in lungs
+  data_comp2 <- as.data.frame( cbind(sample_time, SI[,,2]))              # Total amount in brain
+  data_comp3 <- as.data.frame( cbind(sample_time, SI[,,3]))              # Total amount in kidneys
+  data_comp4 <- as.data.frame( cbind(sample_time, SI[,,4]))              # Total amount in liver
+  data_comp5 <- as.data.frame( cbind(sample_time, SI[,,5]))              # Total amount in spleen
+  data_comp6 <- as.data.frame( cbind(sample_time, SI[,,6]))              # Total amount in blood
 
 colnames(data_comp1) <- c("Time","lambda31","lambda32","lambda33","lambda34","lambda35","lambda41","lambda42","lambda43","lambda44","lambda45","lambda46",
                           "lambda51","lambda52","lambda53","lambda54","lambda61","lambda62","lambda63","lambda71","lambda72","lambda73","lambda81","lambda82","lambda83",
@@ -236,70 +166,39 @@ colnames(data_comp3) <- colnames(data_comp1)
 colnames(data_comp4) <- colnames(data_comp1)
 colnames(data_comp5) <- colnames(data_comp1)
 colnames(data_comp6) <- colnames(data_comp1)
-colnames(data_comp7) <- colnames(data_comp1)
-colnames(data_comp8) <- colnames(data_comp1)
-colnames(data_comp9) <- colnames(data_comp1)
-colnames(data_comp10) <- colnames(data_comp1)
-colnames(data_comp11) <- colnames(data_comp1)
-colnames(data_comp12) <- colnames(data_comp1)
-colnames(data_comp13) <- colnames(data_comp1)
-colnames(data_comp14) <- colnames(data_comp1)
-colnames(data_comp15) <- colnames(data_comp1)
-colnames(data_comp16) <- colnames(data_comp1)
-colnames(data_comp17) <- colnames(data_comp1)
-colnames(data_comp18) <- colnames(data_comp1)
-colnames(data_comp19) <- colnames(data_comp1)
-colnames(data_comp20) <- colnames(data_comp1)
-colnames(data_comp21) <- colnames(data_comp1)
-colnames(data_comp22) <- colnames(data_comp1)
-colnames(data_comp23) <- colnames(data_comp1)
-colnames(data_comp24) <- colnames(data_comp1)
-colnames(data_comp25) <- colnames(data_comp1)
-colnames(data_comp26) <- colnames(data_comp1)
-colnames(data_comp27) <- colnames(data_comp1)
-colnames(data_comp28) <- colnames(data_comp1)
-colnames(data_comp29) <- colnames(data_comp1)
-colnames(data_comp30) <- colnames(data_comp1)
-colnames(data_comp31) <- colnames(data_comp1)
-colnames(data_comp32) <- colnames(data_comp1)
 
-ggplot(data_comp5, aes(x=Time)) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda31,  color = "lambda31"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda32,  color = "lambda32"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda33,  color = "lambda33"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda35,  color = "lambda35"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda41,  color = "lambda41"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda42,  color = "lambda42"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda43,  color = "lambda43"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda44,  color = "lambda44"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda45,  color = "lambda45"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda46,  color = "lambda46"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda51,  color = "lambda51"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda52,  color = "lambda52"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda53,  color = "lambda53"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda61,  color = "lambda61"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda62,  color = "lambda62"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda63,  color = "lambda63"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda71,  color = "lambda71"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda73,  color = "lambda73"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda81,  color = "lambda81"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda82,  color = "lambda82"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda83,  color = "lambda83"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda91,  color = "lambda91"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda92,  color = "lambda92"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambda93,  color = "lambda93"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=k_B,  color = "k_B"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=kb,  color = "kb"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=kl,  color = "kl"),  size = 5) +
-  geom_point(data = data_comp5, aes(x=Time, y=lambdaI,  color = "lambdaI"),  size = 5) +
+
+ggplot(data_comp1, aes(x=Time, y=lambda31,  color = "lambda31")) +
+  geom_line(size=1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda32,  color = "lambda32"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda33,  color = "lambda33"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda35,  color = "lambda35"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda41,  color = "lambda41"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda42,  color = "lambda42"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda43,  color = "lambda43"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda44,  color = "lambda44"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda45,  color = "lambda45"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda46,  color = "lambda46"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda51,  color = "lambda51"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda52,  color = "lambda52"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda53,  color = "lambda53"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda61,  color = "lambda61"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda62,  color = "lambda62"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda63,  color = "lambda63"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda71,  color = "lambda71"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda73,  color = "lambda73"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda81,  color = "lambda81"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda82,  color = "lambda82"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda83,  color = "lambda83"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda91,  color = "lambda91"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda92,  color = "lambda92"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambda93,  color = "lambda93"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=k_B,  color = "k_B"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=kb,  color = "kb"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=kl,  color = "kl"),  size = 1.2) +
+  geom_line(data = data_comp1, aes(x=Time, y=lambdaI,  color = "lambdaI"),  size = 1.2) +
   
   labs(title = "SI vs Time", subtitle = "Compartment 5", y = "SI", x = "Time (in days)") +
-  #scale_colour_manual(name = "Parameters",
-                     # breaks = c("lambda31","lambda32","lambda33","lambda35","lambda41","lambda43","lambda44","lambda45","lambda46",
-                      #           "lambda51","lambda52","lambda53","lambda61","lambda62","lambda63","lambda71","lambda73","lambda81","lambda82","lambda83",
-                       #          "lambda91","lambda92","lambda93","k_B","kb","kl","lambdaI"), #27 parametroi 
-                     # values = c("grey", "red", "royalblue", "pink", "navy", "maroon", "orange", "yellow", "violetred", "rosybrown", "khaki", "hotpink", "cyan", "salmon", "black",
-                             #    )) +
   theme(legend.title=element_text(hjust = 0.5,size=17), 
         legend.text=element_text(size=14))
   

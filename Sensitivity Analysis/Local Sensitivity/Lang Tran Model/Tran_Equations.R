@@ -1,6 +1,6 @@
 #Sourced by "Tran Local Sensitivity.R"
 
-library(deSolve)
+
 dose <- 100 #micro grams
 
 # Initial conditions. In this scenario we study the impact of an intravenous injection
@@ -78,10 +78,33 @@ ode.func <- function(time, M, params){
     
   })}
 
-sample_time <- c(0, 1, 14, 28) #in days
+sample_time <- c(10/(60*24), 1/24, 1, 7, 28, 56) #in days
 solution <- ode(times = sample_time, func = ode.func, y = inits, parms = params, method = "bdf")
-#myname <- ode(times = sample_time, func = ode.func, y = inits, parms = params, method = "bdf")
 
-solution
+Total_amount <- matrix(0, nrow = 6, ncol = 6)
+
+for (t in 1:6) { # t->time indice 
+  ###Total amount of NPs in each organ
+  
+  # Amount in Lungs
+  Total_amount[t,1] <- solution[t,1] + solution[t,2] + solution[t,3] + solution[t,4] + solution[t,5] + solution[t,6]
+  
+  # Amount in Brain
+  Total_amount[t,2] <- solution[t,23] + solution[t,24] + solution[t,25]
+  
+  # Amount in Kidneys
+  Total_amount[t,3] <- solution[t,14] + solution[t,15] + solution[t,16]
+  
+  # Amount in Liver
+  Total_amount[t,4] <- solution[t,7] + solution[t,8] + solution[t,9]
+  
+  # Amount in Spleen
+  Total_amount[t,5] <- solution[t,20] + solution[t,21] + solution[t,22]
+  
+  # Amount in Blood
+  Total_amount[t,6] <- solution[t,29] +solution[t,30] 
+}
+
+#solution
 # Check that mass balance is satisfied
 #rowSums(solution[,2:dim(solution)[2]])
