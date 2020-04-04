@@ -148,28 +148,42 @@ colnames(data_comp4) <- colnames(data_comp1)
 colnames(data_comp5) <- colnames(data_comp1)
 colnames(data_comp6) <- colnames(data_comp1)
 
+bag_of_data <- list(data_comp1,data_comp2,data_comp3, data_comp4, data_comp5, data_comp6)
+comp_names <- ("Lungs", "brain", "kidneys", "liver", "spleen", "blood")
+counter <-1
 
-ggplot(data_comp1, aes(x=Time, y=M_lu_cap, colour = "M_lu_cap"))+
+for(dat in bag_of_data){
+	
+comp_name <- comp_names[counter]
+save_name <- paste0(comp_name,"png",sep = ".")
+data_to_plot <- dat
+	
+my_plot<-ggplot(data_to_plot, aes(x=Time, y=M_lu_cap, colour = "M_lu_cap"))+
   geom_line(size=1.2) +    
-  geom_line(data = data_comp1, aes(x=Time, y=M_bm_cap, color = "M_bm_cap"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=M_br_cap, color = "M_br_cap"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=M_ht_cap, color = "M_ht_cap"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=M_ki_cap, color = "M_ki_cap"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=M_li_cap, color = "M_li_cap"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=M_spl_cap, color = "M_spl_cap"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=M_blood_cap, color = "M_blood_cap"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=M_re_cap, color = "M_re_cap"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=x_fast, color = "x_fast"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=x_re, color = "x_re"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=P, color = "P"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=k_ab0, color = "k_ab0"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=k_ab0_spl, color = "k_ab0_spl"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=k_de, color = "k_de"),size=1.2)+ #terastia  timi se sxesi me ta ipoloipa
-  geom_line(data = data_comp1, aes(x=Time, y=CLE_f, color = "CLE_f"),size=1.2)+
-  
-  labs(title = "SI vs Time", subtitle = "Lungs Compartment", y = "SI", x = "Time (in hours)") +
+  geom_line(data = data_to_plot, aes(x=Time, y=M_bm_cap, color = "M_bm_cap"),size=1.2)+
+  geom_line(data = data_to_plot, aes(x=Time, y=M_br_cap, color = "M_br_cap"),size=1.2)+
+  geom_line(data = data_to_plot, aes(x=Time, y=M_ht_cap, color = "M_ht_cap"),size=1.2)+
+  geom_line(data = data_to_plot, aes(x=Time, y=M_ki_cap, color = "M_ki_cap"),size=1.2)+
+  geom_line(data = data_to_plot, aes(x=Time, y=M_li_cap, color = "M_li_cap"),size=1.2)+
+  geom_line(data = data_to_plot, aes(x=Time, y=M_spl_cap, color = "M_spl_cap"),size=1.2)+
+  geom_line(data = data_to_plot, aes(x=Time, y=M_blood_cap, color = "M_blood_cap"),size=1.2)+
+  geom_line(data = data_to_plot, aes(x=Time, y=M_re_cap, color = "M_re_cap"),size=1.2)+
+  geom_line(data = data_to_plot, aes(x=Time, y=x_fast, color = "x_fast"),size=1.2)+
+  geom_line(data = data_to_plot, aes(x=Time, y=x_re, color = "x_re"),size=1.2)+
+  geom_line(data = data_to_plot, aes(x=Time, y=P, color = "P"),size=1.2)+
+  geom_line(data = data_to_plot, aes(x=Time, y=k_ab0, color = "k_ab0"),size=1.2)+
+  geom_line(data = data_to_plot, aes(x=Time, y=k_ab0_spl, color = "k_ab0_spl"),size=1.2)+
+  geom_line(data = data_to_plot, aes(x=Time, y=k_de, color = "k_de"),size=1.2)+ #terastia  timi se sxesi me ta ipoloipa
+  geom_line(data = data_to_plot, aes(x=Time, y=CLE_f, color = "CLE_f"),size=1.2)+
+  labs(title = "SI vs Time", subtitle = !!, y = "SI", x = "Time (in hours)") +
   scale_colour_manual(name = "Parameters",
                      breaks = c("M_lu_cap", "M_bm_cap", "M_br_cap", "M_ht_cap", "M_ki_cap", "M_li_cap", "M_spl_cap", "M_blood_cap", "M_re_cap", "x_fast", "x_re", "P", "k_ab0", "k_ab0_spl","k_de", "CLE_f"),
                      values = c("grey", "red", "royalblue", "pink", "navy", "maroon", "orange", "yellow", "violetred", "rosybrown", "khaki", "hotpink", "cyan", "salmon","blue",  "black")) +
   theme(legend.title=element_text(hjust = 0.5,size=17), 
         legend.text=element_text(size=14))
+
+png(!!save_name, width = 15, height = 10, units = 'in', res = 500)
+print(my_plot)
+dev.off()
+counter <- counter+1
+}
