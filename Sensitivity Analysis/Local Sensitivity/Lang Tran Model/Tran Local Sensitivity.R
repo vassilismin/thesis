@@ -2,6 +2,8 @@ setwd("C:\\Users\\vassi\\Documents\\Diploma Thesis\\Lang Tran Files\\Sensitivity
 options(max.print=1000000)
 library(deSolve)
 library(ggplot2)
+library(dplyr)
+library(rlang)
 
 init <- 1
 Dx <- 0.2   # to pososto metavolis ton parametron
@@ -145,7 +147,7 @@ for (z in 1:37) {
   for (w in 1:6) {      ### deiktis diamerismatos
     for (t in 1:6) {   ### deiktis xronikis stigmis
       for (p in 1:37){
-        SI[t,p,w] <- (abs(ar2[t,p,w]-init_solution[t,w]) / (Dx*init_params[p] + eps)) /(init_solution[t,w] + eps)
+        SI[t,p,w] <- eps + (abs(ar2[t,p,w]-init_solution[t,w]) / (Dx*init_params[p] + eps)) /(init_solution[t,w] + eps)
       }
     }	
   }
@@ -167,38 +169,54 @@ colnames(data_comp4) <- colnames(data_comp1)
 colnames(data_comp5) <- colnames(data_comp1)
 colnames(data_comp6) <- colnames(data_comp1)
 
+bag_of_data <- list(data_comp1,data_comp2,data_comp3, data_comp4, data_comp5, data_comp6)
+comp_names <- c("Lungs", "brain", "kidneys", "liver", "spleen", "blood")
+counter <- 1
 
-ggplot(data_comp1, aes(x=Time, y=lambda31,  color = "lambda31")) +
+for(dat in bag_of_data){
+  comp_name <- comp_names[counter]
+  save_name <- paste0(comp_name,".png",sep = "")
+  data_to_plot <- dat
+
+
+my_plot <- ggplot(data_to_plot, aes(x=Time, y=lambda31,  color = "lambda31")) +
   geom_line(size=1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda32,  color = "lambda32"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda33,  color = "lambda33"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda35,  color = "lambda35"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda41,  color = "lambda41"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda42,  color = "lambda42"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda43,  color = "lambda43"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda44,  color = "lambda44"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda45,  color = "lambda45"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda46,  color = "lambda46"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda51,  color = "lambda51"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda52,  color = "lambda52"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda53,  color = "lambda53"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda61,  color = "lambda61"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda62,  color = "lambda62"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda63,  color = "lambda63"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda71,  color = "lambda71"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda73,  color = "lambda73"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda81,  color = "lambda81"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda82,  color = "lambda82"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda83,  color = "lambda83"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda91,  color = "lambda91"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda92,  color = "lambda92"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambda93,  color = "lambda93"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=k_B,  color = "k_B"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=kb,  color = "kb"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=kl,  color = "kl"),  size = 1.2) +
-  geom_line(data = data_comp1, aes(x=Time, y=lambdaI,  color = "lambdaI"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda32,  color = "lambda32"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda33,  color = "lambda33"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda35,  color = "lambda35"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda41,  color = "lambda41"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda42,  color = "lambda42"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda43,  color = "lambda43"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda44,  color = "lambda44"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda45,  color = "lambda45"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda46,  color = "lambda46"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda51,  color = "lambda51"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda52,  color = "lambda52"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda53,  color = "lambda53"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda61,  color = "lambda61"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda62,  color = "lambda62"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda63,  color = "lambda63"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda71,  color = "lambda71"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda73,  color = "lambda73"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda81,  color = "lambda81"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda82,  color = "lambda82"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda83,  color = "lambda83"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda91,  color = "lambda91"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda92,  color = "lambda92"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambda93,  color = "lambda93"),  size = 1.2) +
+  #geom_line(data = data_to_plot, aes(x=Time, y=k_B,  color = "k_B"),  size = 1.2) + # terastia  timi
+  geom_line(data = data_to_plot, aes(x=Time, y=kb,  color = "kb"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=kl,  color = "kl"),  size = 1.2) +
+  geom_line(data = data_to_plot, aes(x=Time, y=lambdaI,  color = "lambdaI"),  size = 1.2) +
   
-  labs(title = "SI vs Time", subtitle = "Compartment 5", y = "SI", x = "Time (in days)") +
+  scale_y_log10() +
+  
+  labs(title = "SI vs Time", subtitle = rlang::expr(!!comp_name), y = "SI", x = "Time (in days)") +
   theme(legend.title=element_text(hjust = 0.5,size=17), 
         legend.text=element_text(size=14))
-  
+
+png(rlang::expr(!!save_name), width = 15, height = 10, units = 'in', res = 500)
+print(my_plot)
+dev.off()
+counter <- counter+1
+}

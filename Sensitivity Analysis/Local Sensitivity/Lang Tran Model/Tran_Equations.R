@@ -80,6 +80,7 @@ ode.func <- function(time, M, params){
 
 sample_time <- c(10/(60*24), 1/24, 1, 7, 28, 56) #in days
 solution <- ode(times = sample_time, func = ode.func, y = inits, parms = params, method = "bdf")
+solution <- solution[,2:33]
 
 Total_amount <- matrix(0, nrow = 6, ncol = 6)
 

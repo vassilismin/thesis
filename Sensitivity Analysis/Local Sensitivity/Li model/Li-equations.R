@@ -90,10 +90,11 @@ inits <- as.vector(y)
       
     })}
   
-  sample_time <- c(10/60, 1, 24, 24*7, 24*28, 24*56)
+  #sample_time <- c(10/60, 1, 24, 24*7, 24*28, 24*56)
+  sample_time <- c(10/60, 20/60, 30/60, 40/60, 50/60, 1)
   
   solution <- ode(times = sample_time, func = ode.func, y = inits, parms = params, method = "lsodes")
-
+  solution <- solution[,2:22]
   
   for (x in 1:6) {
     for (y in 1:21) {

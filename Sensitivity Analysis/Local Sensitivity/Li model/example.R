@@ -2,6 +2,9 @@ setwd("C:\\Users\\vassi\\Documents\\Diploma Thesis\\Li_model_tests\\Sensitivity 
 options(max.print=1000000)
 library(deSolve)
 library(ggplot2)
+library(dplyr)
+library(rlang)
+
 
 init = 1
 Dx <- 0.2   # to pososto metavolis ton parametron
@@ -84,12 +87,12 @@ source("Li-equations.R")          # epilisi toy montelou gia ti arxikes times to
 init_solution <- Total_amount # kratao ta apotelesmata mono gia oles tis xronikes stigmes epilisis
 
 init_params <- params
-			###Epanaliptiki diadikasia ypologismou apotelesmaton gia kathe nea parametro
+###Epanaliptiki diadikasia ypologismou apotelesmaton gia kathe nea parametro
 for (i in 1:16) {
-
-      # xrisimopoieitai pio kato gia ton ypologismo arxikon apotelesmaton xoris kapoia metavoli stis parametrous
+  
+  # xrisimopoieitai pio kato gia ton ypologismo arxikon apotelesmaton xoris kapoia metavoli stis parametrous
   params[i] <- mult*params[i]    # epivoli metavolis tis parametrou i kata Dx (oristike stin arxi) 
-
+  
   ###Sto parakato kommati ginetai antistoixisi twn newn timwn twn parametrwn me tis antistoixes onomasies tous 
   M_lu_cap <- params[1] # maximum phagocytizing cells uptake per lung weight, fitted value - ug/g
   M_bm_cap <- params[2] # maximum phagocytizing cells uptake per bone marrow weight, fitted value - ug/g
@@ -108,28 +111,28 @@ for (i in 1:16) {
   k_ab0_spl  <- params[14] # maximum uptake rate by phagocytizing cells in spleen, fitted value - 1/h
   k_de <- params[15] # desorption rate by phagocytizing cells, fitted value - 1/h   
   CLE_f <-  params[16]
- 
+  
   source("Li-equations.R")     # epilisi toy montelou gia ti nea timi tis parametrou i
-
+  
   ar[,,i] <- Total_amount #dimiourgia 3d array (6x6x16), diladi ta apotelesmata twn 21 diaforikwn se 6 xronikes stigmes epilisis gia metavoli se kathe mia apo tis 16 parametrous
   params <- init_params
-  }
+}
 
 ###Metatropi tou pinaka ar se diastaseis 6x16x6
 for (z in 1:16) {
   for (w in 1:6) {
-      ar2[,z,w] <- ar[,w,z]  
-      }
+    ar2[,z,w] <- ar[,w,z]  
+  }
 } 
-
+eps = 1e-10
 ###Sensitivity Index (SI) calculation
 SI <- array(0, c(6, 16, 6)) 
 for (w in 1:6) {      ### deiktis diamerismatos
-    for (t in 1:6) {   ### deiktis xronikis stigmis
-		for (p in 1:16){
-			SI[t,p,w] <- (abs(ar2[t,p,w]-init_solution[t,w]) / (Dx*init_params[p])) /(init_solution[t,w]+ 1e-10)
-        }
-	}	
+  for (t in 1:6) {   ### deiktis xronikis stigmis
+    for (p in 1:16){
+      SI[t,p,w] <-eps + (abs(ar2[t,p,w]-init_solution[t,w]) / (Dx*init_params[p])) /(init_solution[t,w]+ eps)
+    }
+  }	
 }
 
 #Dimiourgia data frame gia kathe diamerisma gia ta SI olon ton parametrwn      
@@ -148,28 +151,44 @@ colnames(data_comp4) <- colnames(data_comp1)
 colnames(data_comp5) <- colnames(data_comp1)
 colnames(data_comp6) <- colnames(data_comp1)
 
+bag_of_data <- list(data_comp1,data_comp2,data_comp3, data_comp4, data_comp5, data_comp6)
+comp_names <- c("Lungs", "brain", "kidneys", "liver", "spleen", "blood")
+counter <-1
 
-ggplot(data_comp1, aes(x=Time, y=M_lu_cap, colour = "M_lu_cap"))+
-  geom_line(size=1.2) +    
-  geom_line(data = data_comp1, aes(x=Time, y=M_bm_cap, color = "M_bm_cap"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=M_br_cap, color = "M_br_cap"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=M_ht_cap, color = "M_ht_cap"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=M_ki_cap, color = "M_ki_cap"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=M_li_cap, color = "M_li_cap"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=M_spl_cap, color = "M_spl_cap"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=M_blood_cap, color = "M_blood_cap"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=M_re_cap, color = "M_re_cap"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=x_fast, color = "x_fast"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=x_re, color = "x_re"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=P, color = "P"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=k_ab0, color = "k_ab0"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=k_ab0_spl, color = "k_ab0_spl"),size=1.2)+
-  geom_line(data = data_comp1, aes(x=Time, y=k_de, color = "k_de"),size=1.2)+ #terastia  timi se sxesi me ta ipoloipa
-  geom_line(data = data_comp1, aes(x=Time, y=CLE_f, color = "CLE_f"),size=1.2)+
+for(dat in bag_of_data){
+  comp_name <- comp_names[counter]
+  save_name <- paste0(comp_name,".png",sep = "")
+  data_to_plot <- dat
   
-  labs(title = "SI vs Time", subtitle = "Lungs Compartment", y = "SI", x = "Time (in hours)") +
-  scale_colour_manual(name = "Parameters",
-                     breaks = c("M_lu_cap", "M_bm_cap", "M_br_cap", "M_ht_cap", "M_ki_cap", "M_li_cap", "M_spl_cap", "M_blood_cap", "M_re_cap", "x_fast", "x_re", "P", "k_ab0", "k_ab0_spl","k_de", "CLE_f"),
-                     values = c("grey", "red", "royalblue", "pink", "navy", "maroon", "orange", "yellow", "violetred", "rosybrown", "khaki", "hotpink", "cyan", "salmon","blue",  "black")) +
-  theme(legend.title=element_text(hjust = 0.5,size=17), 
-        legend.text=element_text(size=14))
+
+  my_plot<-ggplot(data_to_plot, aes(x=Time, y=M_lu_cap, colour = "M_lu_cap"))+
+    geom_line(size=1.2) +    
+    geom_line(data = data_to_plot, aes(x=Time, y=M_bm_cap, color = "M_bm_cap"),size=1.2)+
+    geom_line(data = data_to_plot, aes(x=Time, y=M_br_cap, color = "M_br_cap"),size=1.2)+
+    geom_line(data = data_to_plot, aes(x=Time, y=M_ht_cap, color = "M_ht_cap"),size=1.2)+
+    geom_line(data = data_to_plot, aes(x=Time, y=M_ki_cap, color = "M_ki_cap"),size=1.2)+
+    geom_line(data = data_to_plot, aes(x=Time, y=M_li_cap, color = "M_li_cap"),size=1.2)+
+    geom_line(data = data_to_plot, aes(x=Time, y=M_spl_cap, color = "M_spl_cap"),size=1.2)+
+    geom_line(data = data_to_plot, aes(x=Time, y=M_blood_cap, color = "M_blood_cap"),size=1.2)+
+    geom_line(data = data_to_plot, aes(x=Time, y=M_re_cap, color = "M_re_cap"),size=1.2)+
+    geom_line(data = data_to_plot, aes(x=Time, y=x_fast, color = "x_fast"),size=1.2)+
+    geom_line(data = data_to_plot, aes(x=Time, y=x_re, color = "x_re"),size=1.2)+
+    geom_line(data = data_to_plot, aes(x=Time, y=P, color = "P"),size=1.2)+
+    geom_line(data = data_to_plot, aes(x=Time, y=k_ab0, color = "k_ab0"),size=1.2)+
+    geom_line(data = data_to_plot, aes(x=Time, y=k_ab0_spl, color = "k_ab0_spl"),size=1.2)+
+    #(data = data_to_plot, aes(x=Time, y=k_de, color = "k_de"),size=1.2)+ #terastia  timi se sxesi me ta ipoloipa
+    geom_line(data = data_to_plot, aes(x=Time, y=CLE_f, color = "CLE_f"),size=1.2)+
+    labs(title = "SI vs Time", subtitle = rlang::expr(!!comp_name), y = "SI", x = "Time (in hours)") +
+    scale_y_log10() +
+    scale_colour_manual(name = "Parameters",
+                        breaks = c("M_lu_cap", "M_bm_cap", "M_br_cap", "M_ht_cap", "M_ki_cap", "M_li_cap", "M_spl_cap", "M_blood_cap", "M_re_cap", "x_fast", "x_re", "P", "k_ab0", "k_ab0_spl","k_de", "CLE_f"),
+                        values = c("grey", "red", "royalblue", "pink", "navy", "maroon", "orange", "yellow", "violetred", "rosybrown", "khaki", "hotpink", "cyan", "salmon","blue",  "black")) +
+    theme(legend.title=element_text(hjust = 0.5,size=17), 
+          legend.text=element_text(size=14))+
+    
+  
+  png(rlang::expr(!!save_name), width = 15, height = 10, units = 'in', res = 500)
+  print(my_plot)
+  dev.off()
+  counter <- counter+1
+}
