@@ -109,7 +109,7 @@ functions{
 
         //Liver
         dMdt[7]  = ((M[29]/Vart)*Q[1]) - ((M[7]/Vcap[1])*Q[1]) + ((M[8]/Vtis[1])*lambda3[1]*Q[1]) - ((M[7]/Vcap[1])*Q_liver*lambda3[2]) -
-                 ((M[7]/Vcap[1])*Q_bile*lambda3[5]) + ((M[10]/Vcap[2])*Q[2]*lambda4[5]) + ((M[20]/Vcap[5])*Q[5]) ;  //capillary
+                 ((M[7]/Vcap[1])*Q_bile*lambda3[5]) + ((M[10]/Vcap[2])*Q[2]*lambda4[5]) + ((M[20]/Vcap[5])*lambda7[2]*Q[5]) ;  //capillary
         dMdt[8] =  ((M[7]/Vcap[1])*Q[1]) - ((M[8]/Vtis[1])*lambda3[1]*Q[1]) - (lambda3[3]*M[8])  ; //tissue
         dMdt[9]  = (lambda3[3]*M[8]) ; //seq
 
@@ -131,7 +131,7 @@ functions{
         dMdt[19]  = (lambda6[3]*M[18]) ; //seq
 
         //Spleen
-        dMdt[20]  = ((M[29]/Vart)*Q[5]) - ((M[20]/Vcap[5])*Q[5]) + ((M[21]/Vtis[5])*lambda7[1]*Q[5]) - ((M[20]/Vcap[5])*Q[5]) ;  //capillary
+        dMdt[20]  = ((M[29]/Vart)*Q[5]) - ((M[20]/Vcap[5])*Q[5]) + ((M[21]/Vtis[5])*lambda7[1]*Q[5]) - ((M[20]/Vcap[5])*lambda7[2]*Q[5]) ;  //capillary
         dMdt[21] =  ((M[20]/Vcap[5])*Q[5]) - ((M[21]/Vtis[5])*lambda7[1]*Q[5]) - (lambda7[3]*M[21]) ; //tissue
         dMdt[22]  = (lambda7[3]*M[21]) ; //seq
 
