@@ -1,4 +1,4 @@
-### Iportant!!! each compartment has a specific index in vectors Tissue_rates, Regional_flow_rates, Capillary_rates and cannot be changed
+### Iportant!!! each compartment has a specific index vectors Tissue_fractions, Regional_flow_fractions, Capillary_fractions and cannot be changed
 # The index of each compartment:
 #Rest of Body (rob) --> 1
 #Heart (ht) --> 2
@@ -12,7 +12,7 @@
 ### User's INPUT ###
 ####################
 #### If any of these compartments don not exist in pbpk, just give it the value NA in compartments vector, example: "Heart" = NA and it will remove it 
-#### from the equilibriums and the corresponding V_tis, V_cap, Q will be equal to 0.
+#### from the equilibriums and the corresponding V_tis, V_cap, Q will be equal to NA.
   
 
 compartments <- list( "RoB"="RoB","Heart"="Heart", "Kidneys"="Kidneys", "Brain"="Brain", "Spleen"="Spleen",
@@ -25,6 +25,7 @@ BW <- 250 # Total Body weight of rat in g
 
 create.params <- function(comp_names, w){
   
+  # List with names of all possible compartments
   all_comps <- list("RoB"="RoB", "Heart"="Heart", "Kidneys"="Kidneys", "Brain"="Brain", "Spleen"="Spleen",
                     "Lungs"="Lungs", "Liver"="Liver") # List with names of all possible compartments
   
@@ -40,23 +41,14 @@ create.params <- function(comp_names, w){
   
   
   #Tissue weight or volumes rates 
-  Tissue_rates <- c(NA, 0.33 , 0.73, 0.60, 0.20, 0.5, 3.66)/100 # % of BW. Na values refers to the volume of the rest organs(RoB)
+  Tissue_fractions <- c(NA, 0.33 , 0.73, 0.60, 0.20, 0.5, 3.66)/100 # % of BW. Na values refers to the volume of the rest organs(RoB)
   
   #Regional blood flow rates
-  Regional_flow_rates <- c(NA, 4.9, 14.1, 2.0, 1.22, 2.1, 17.4)/100 # % of total cardiac output
+  Regional_flow_fractions <- c(NA, 4.9, 14.1, 2.0, 1.22, 2.1, 17.4)/100 # % of total cardiac output
   
   #Capillary volume rates (rates of tissue volume)
-  Capillary_rates <- c(NA, 0.26, 0.16, 0.03, 0.22, 0.36, 0.21)/100 # % of tissue volume
+  Capillary_fractions <- c(NA, 0.26, 0.16, 0.03, 0.22, 0.36, 0.21)/100 # % of tissue volume
   
-  #Tissue_rates[1] <- 100 - sum(Tissue_rates[2:length(Tissue_rates)])
-  #Regional_flow_rates[1] <- 100 - sum(Regional_flow_rates[2:length(Regional_flow_rates)])
-  #Capillary_rates[1] <- 100 - sum(Capillary_rates[2:length(Capillary_rates)]) - ((Vven + Vart)/Total_Blood)*100
-  
-  #Arterial blood volume
-  Vart <- 0.15*Total_Blood
-  
-  #Veins blood volume
-  Vven <- 0.64*Total_Blood
   
   V_tis <- rep(0,length(comp_names))
   V_cap <- rep(0,length(comp_names))
@@ -66,15 +58,15 @@ create.params <- function(comp_names, w){
   for (i in 1:length(comp_names)) {
     control <- comp_names[i]
     
-    Tissue_rates[i] <- ifelse(is.na(control), 0, Tissue_rates[i])
-    Regional_flow_rates[i] <- ifelse(is.na(control), 0, Regional_flow_rates[i])
-    Capillary_rates[i] <- ifelse(is.na(control), 0, Capillary_rates[i])
+    Tissue_fractions[i] <- ifelse(is.na(control), NA, Tissue_fractions[i])
+    Regional_flow_fractions[i] <- ifelse(is.na(control), NA, Regional_flow_fractions[i])
+    Capillary_fractions[i] <- ifelse(is.na(control), NA, Capillary_fractions[i])
       
       
     
-    V_tis[i] <- w*Tissue_rates[i]
-    V_cap[i] <- V_tis[i]*Capillary_rates[i]
-    Q[i] <- Q_total*Regional_flow_rates[i]
+    V_tis[i] <- w*Tissue_fractions[i]
+    V_cap[i] <- V_tis[i]*Capillary_fractions[i]
+    Q[i] <- Q_total*Regional_flow_fractions[i]
     }
 
   ### Calculations for "Rest of Body" compartment
