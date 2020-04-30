@@ -1,4 +1,4 @@
-### Iportant!!! each compartment has a specific index vectors Tissue_rates, Regional_flow_rates, Capillary_rates and cannot be changed
+### Iportant!!! each compartment has a specific index in vectors Tissue_rates, Regional_flow_rates, Capillary_rates and cannot be changed
 # The index of each compartment:
 #Rest of Body (rob) --> 1
 #Heart (ht) --> 2
