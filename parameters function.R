@@ -28,9 +28,9 @@ create.params <- function(comp_names, w){
   all_comps <- list("RoB"="RoB", "Heart"="Heart", "Kidneys"="Kidneys", "Brain"="Brain", "Spleen"="Spleen",
                     "Lungs"="Lungs", "Liver"="Liver") # List with names of all possible compartments
   
-  Q_total <- 1.54*BW^0.75 # Total Cardiac Output (ml/min)
+  Q_total <- 1.54*w^0.75 # Total Cardiac Output (ml/min)
   
-  Total_Blood <- 0.06*BW+0.77 # Total blood volume (ml)
+  Total_Blood <- 0.06*w+0.77 # Total blood volume (ml)
   
   #Arterial blood volume
   Vart <- 0.15*Total_Blood #(ml)
