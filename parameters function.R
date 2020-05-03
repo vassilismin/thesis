@@ -59,7 +59,7 @@ create.params <- function(comp_names, w){
   
   #Capillary volume fractions (fractions of tissue volume)
   Capillary_fractions <- c(NA, 0.26, 0.16, 0.03, 0.22, 0.36, 0.21, 0.077, 0.04, 0.0055, 0.02) # of tissue volume
-                                                                                       # Where NA, it is the same value as Rest of Body due to luck od data for uterus and adipose
+                                                                                       
   
   W_tis <- rep(0,length(comp_names))
   V_tis <- rep(0,length(comp_names))
