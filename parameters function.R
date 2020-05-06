@@ -59,7 +59,7 @@ create.params <- function(comp_names, w){
   
   #Capillary volume fractions (fractions of tissue volume)
   Capillary_fractions <- c(NA, 0.26, 0.16, 0.03, 0.22, 0.36, 0.21, 0.077, 0.04, 0.0055, 0.02) # of tissue volume
-                                                                                       
+                                                                                       # Where NA, it is the same value as Rest of Body due to luck od data for uterus and adipose
   
   W_tis <- rep(0,length(comp_names))
   V_tis <- rep(0,length(comp_names))
@@ -116,8 +116,8 @@ create.params <- function(comp_names, w){
               "W_rob"=parms[1,1], "W_ht"=parms[2,1], "W_ki"=parms[3,1], "W_br"=parms[4,1], "W_spl"=parms[5,1], "W_lu"=parms[6,1], "W_li"=parms[7,1], "W_ut"=parms[8,1], "W_skel"=parms[9,1],
               "W_ad"=parms[10,1], "W_skin"=parms[11,1],  
               
-              "V_rob"=parms[1,2], "V_ht"=parms[2,2], "V_ki"=parms[3,2], "V_br"=parms[4,2], "V_spl"=parms[5,2], "V_lu"=parms[6,2], "V_li"=parms[7,2], "V_ut"=parms[8,2], "V_skel"=parms[9,2],
-              "V_ad"=parms[10,2], "W_skin"=parms[11,2],
+              "Vtis_rob"=parms[1,2], "Vtis_ht"=parms[2,2], "Vtis_ki"=parms[3,2], "Vtis_br"=parms[4,2], "Vtis_spl"=parms[5,2], "Vtis_lu"=parms[6,2], "Vtis_li"=parms[7,2], "Vtis_ut"=parms[8,2], "Vtis_skel"=parms[9,2],
+              "Vtis_ad"=parms[10,2], "Vtis_skin"=parms[11,2],
               
               "Vcap_rob"=parms[1,3], "Vcap_ht"=parms[2,3], "Vcap_ki"=parms[3,3], "Vcap_br"=parms[4,3], "Vcap_spl"=parms[5,3], "Vcap_lu"=parms[6,3], "Vcap_li"=parms[7,3], "Vcap_ut"=parms[8,3], "Vcap_skel"=parms[9,3],
               "Vcap_ad"=parms[10,3], "Vcap_skin"=parms[11,3], 
