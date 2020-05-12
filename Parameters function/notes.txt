@@ -1,0 +1,12 @@
+### Iportant!!! each compartment has a specific index vectors Tissue_fractions, Regional_flow_fractions, Capillary_fractions and cannot be changed
+# The index of each compartment:
+#Rest of Body (rob) --> 1
+#Heart (ht) --> 2
+#Kidneys (ki) --> 3
+#Brain (br) --> 4
+#Spleen (spl) --> 5
+#Lungs (lu) --> 6
+#Liver (li) --> 7
+
+If any of these compartments don not exist in pbpk, just give it the value NA in compartments vector, example: "Heart" = NA and it will remove it 
+from the equilibriums and the corresponding V_tis, V_cap, Q will be equal to NA.
