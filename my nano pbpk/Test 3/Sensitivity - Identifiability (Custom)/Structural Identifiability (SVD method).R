@@ -1,6 +1,5 @@
 library(deSolve)
-library(Bolstad)
-
+options(max.print=999999)
 
 setwd("C:\\Users\\vassi\\Documents\\Diploma Thesis\\My nano PBPK\\Final Model\\Fitting\\Test 3") #location of physiological parameters
 
@@ -136,42 +135,42 @@ create.params <- function(comp_names, w){
   
   
   return(c(P_1=6, #liver
-              P_2=0.55, #spleen
-              P_3=0.01, #kidneys, lungs, blood
-              P_4=0.1, #heart, uterus
-              P_5=0.005, #Skeleton, Soft tissue 
-              P_6=1e-10, #brain
-              
-              x_1=1000, #liver
-              x_2=1000, #spleen
-              x_3=0.0001, #kidneys, lungs, blood
-              x_4=0.001, #heart, uterus
-              x_5=10, #Skeleton, Soft tissue
-              x_6=1e-10, #brain,
-              k_de=0.0001,
-              Km=5, #micro-g/ml 
-              Pup=0.995, #ml/h/(ml pcs)
-              
-              
-              CLE_f=0.0008, #1/h
-              CLE_u=1.7, #1/h
-              
-              "Q_total"=Q_total, "V_blood"=Total_Blood, "Vven"=Vven, "Vart"=Vart, "Vm_ven"=Vm_ven, "Vm_art"=Vm_art,
-              
-              "W_rob"=parameters[1,1], "W_ht"=parameters[2,1], "W_ki"=parameters[3,1], "W_br"=parameters[4,1], "W_spl"=parameters[5,1], "W_lu"=parameters[6,1], "W_li"=parameters[7,1], "W_ut"=parameters[8,1], "W_skel"=parameters[9,1],
-              "W_ad"=parameters[10,1], "W_skin"=parameters[11,1], "W_mu"=parameters[12,1], 
-              
-              "Vtis_rob"=parameters[1,2], "Vtis_ht"=parameters[2,2], "Vtis_ki"=parameters[3,2], "Vtis_br"=parameters[4,2], "Vtis_spl"=parameters[5,2], "Vtis_lu"=parameters[6,2], "Vtis_li"=parameters[7,2], "Vtis_ut"=parameters[8,2], "Vtis_skel"=parameters[9,2],
-              "Vtis_ad"=parameters[10,2], "Vtis_skin"=parameters[11,2], "Vtis_mu"=parameters[12,2],
-              
-              "Vcap_rob"=parameters[1,3], "Vcap_ht"=parameters[2,3], "Vcap_ki"=parameters[3,3], "Vcap_br"=parameters[4,3], "Vcap_spl"=parameters[5,3], "Vcap_lu"=parameters[6,3], "Vcap_li"=parameters[7,3], "Vcap_ut"=parameters[8,3], "Vcap_skel"=parameters[9,3],
-              "Vcap_ad"=parameters[10,3], "Vcap_skin"=parameters[11,3], "Vcap_mu"=parameters[12,3],
-              
-              "Vm_rob"=parameters[1,5], "Vm_ht"=parameters[2,5], "Vm_ki"=parameters[3,5], "Vm_br"=parameters[4,5], "Vm_spl"=parameters[5,5], "Vm_lu"=parameters[6,5], "Vm_li"=parameters[7,5], "Vm_ut"=parameters[8,5], "Vm_skel"=parameters[9,5],
-              "Vm_ad"=parameters[10,5], "Vm_skin"=parameters[11,5], "Vm_mu"=parameters[12,5],
-              "Q_rob"=parameters[1,4]+parameters[6,4], "Q_ht"=parameters[2,4], "Q_ki"=parameters[3,4], "Q_br"=parameters[4,4], "Q_spl"=parameters[5,4], "Q_lu"=parameters[6,4], "Q_li"=parameters[7,4], "Q_ut"=parameters[8,4], "Q_skel"=parameters[9,4],
-              "Q_ad"=parameters[10,4], "Q_skin"=parameters[11,4], "Q_mu"=parameters[12,4]
-              ))
+           P_2=0.55, #spleen
+           P_3=0.01, #kidneys, lungs, blood
+           P_4=0.1, #heart, uterus
+           P_5=0.005, #Skeleton, Soft tissue 
+           P_6=1e-10, #brain
+           
+           x_1=1000, #liver
+           x_2=1000, #spleen
+           x_3=0.0001, #kidneys, lungs, blood
+           x_4=0.001, #heart, uterus
+           x_5=10, #Skeleton, Soft tissue
+           x_6=1e-10, #brain,
+           k_de=0.0001,
+           Km=5, #micro-g/ml 
+           Pup=0.995, #ml/h/(ml pcs)
+           
+           
+           CLE_f=0.0008, #1/h
+           CLE_u=1.7, #1/h
+           
+           "Q_total"=Q_total, "V_blood"=Total_Blood, "Vven"=Vven, "Vart"=Vart, "Vm_ven"=Vm_ven, "Vm_art"=Vm_art,
+           
+           "W_rob"=parameters[1,1], "W_ht"=parameters[2,1], "W_ki"=parameters[3,1], "W_br"=parameters[4,1], "W_spl"=parameters[5,1], "W_lu"=parameters[6,1], "W_li"=parameters[7,1], "W_ut"=parameters[8,1], "W_skel"=parameters[9,1],
+           "W_ad"=parameters[10,1], "W_skin"=parameters[11,1], "W_mu"=parameters[12,1], 
+           
+           "Vtis_rob"=parameters[1,2], "Vtis_ht"=parameters[2,2], "Vtis_ki"=parameters[3,2], "Vtis_br"=parameters[4,2], "Vtis_spl"=parameters[5,2], "Vtis_lu"=parameters[6,2], "Vtis_li"=parameters[7,2], "Vtis_ut"=parameters[8,2], "Vtis_skel"=parameters[9,2],
+           "Vtis_ad"=parameters[10,2], "Vtis_skin"=parameters[11,2], "Vtis_mu"=parameters[12,2],
+           
+           "Vcap_rob"=parameters[1,3], "Vcap_ht"=parameters[2,3], "Vcap_ki"=parameters[3,3], "Vcap_br"=parameters[4,3], "Vcap_spl"=parameters[5,3], "Vcap_lu"=parameters[6,3], "Vcap_li"=parameters[7,3], "Vcap_ut"=parameters[8,3], "Vcap_skel"=parameters[9,3],
+           "Vcap_ad"=parameters[10,3], "Vcap_skin"=parameters[11,3], "Vcap_mu"=parameters[12,3],
+           
+           "Vm_rob"=parameters[1,5], "Vm_ht"=parameters[2,5], "Vm_ki"=parameters[3,5], "Vm_br"=parameters[4,5], "Vm_spl"=parameters[5,5], "Vm_lu"=parameters[6,5], "Vm_li"=parameters[7,5], "Vm_ut"=parameters[8,5], "Vm_skel"=parameters[9,5],
+           "Vm_ad"=parameters[10,5], "Vm_skin"=parameters[11,5], "Vm_mu"=parameters[12,5],
+           "Q_rob"=parameters[1,4]+parameters[6,4], "Q_ht"=parameters[2,4], "Q_ki"=parameters[3,4], "Q_br"=parameters[4,4], "Q_spl"=parameters[5,4], "Q_lu"=parameters[6,4], "Q_li"=parameters[7,4], "Q_ut"=parameters[8,4], "Q_skel"=parameters[9,4],
+           "Q_ad"=parameters[10,4], "Q_skin"=parameters[11,4], "Q_mu"=parameters[12,4]
+  ))
 }
 
 params<-create.params(compartments,BW)
@@ -385,38 +384,35 @@ ode.func <- function(time, inits, params){
     
   })}
 
-#sample_time <- c(0, 10/60, 1, 1*24, 7*24, 28*24) #in hours
-sample_time <- seq(0, 28*24, 0.1) #in hours
-N_time <- length(sample_time)
+sample_time <- c(0, 10/60, 1, 1*24, 7*24, 28*24) #in hours
+#sample_time <- seq(0, 28*24, 0.1) #in hours
+N_time <- length(sample_time)-1 #exclude the initial moment t0=0s
 N_comps <- 13 #number of compartments examined
 N_params <- 17 #number of parameters to be examined
+N_exp <- 15 #number of parametric vectors sampled between [0.5,1.5]*theta
+thetas <- matrix(0, nrow = N_exp, ncol = N_params)
 
-
-##### CALCULATE INITIAL AUC VALUES ##### 
-
+##### CALCULATE INITIAL OUTPUT VALUES ##### 
 solution <- ode(times = sample_time, func = ode.func, y = inits, parms = params, method = "bdf")
 #print(solution)
 #rowSums(solution[,2:(length(inits)+1)])
 
-Total_amounts <- solution[,38:50]
+Total_amounts <- solution[2:6,38:50]
 init_solution <- Total_amounts
-init_AUC <- rep(0,N_comps)
-
-for (comp in 1:N_comps) {
-  auc_old <- sintegral(sample_time, init_solution[,comp], n.pts = 1e5)
-  init_AUC[comp] <- as.numeric(auc_old["value"])
-}
-#print(init_AUC)
+init_solution <- as.vector(init_solution)
+init_solution <- matrix(init_solution, ncol = 1)
 
 init_params <- params
-Dx <- 0.1
-multiplier <- 1 + Dx
-AUC <- matrix(0, nrow=N_comps,ncol=N_params)
-SI_AUC <- AUC
 
+##### CALCULATION WITH SAMPLING OF THETA BETWEEN [0.5,1.5] #####
+Total_SI <- array(0, c(N_comps*N_time, N_params, N_exp))
+samples <- runif(N_exp, 0.5, 1.5)
 
-for (i in 1:N_params) {
-  params[i] <- multiplier*params[i]
+for (i in 1:N_exp) {
+  multiplier <- samples[i]
+  Dx <- multiplier-1
+  
+  params[1:N_params] <- multiplier*params[1:N_params] ### Calculation of thetas with sampling
   
   P_1<-params[1] #liver
   P_2<-params[2] #spleen
@@ -442,19 +438,30 @@ for (i in 1:N_params) {
   solution <- ode(times = sample_time, func = ode.func, y = inits, parms = params, method = "bdf")
   #print(solution)
   #rowSums(solution[,2:(length(inits)+1)])
-  Total_amounts <- solution[,38:50]
+  Total_amounts <- solution[2:6,38:50]
+  Total_amounts <- as.vector(Total_amounts)
+  Total_amounts <- matrix(Total_amounts, ncol = 1)
   
-  for (comp in 1:N_comps) {
-    auc_integration <- sintegral(sample_time, Total_amounts[,comp], n.pts = 1e5)
-    AUC[comp,i] <- as.numeric(auc_integration["value"])
+  for (p in 1:N_params) {
+    Total_SI[,p,i] <- (Total_amounts - init_solution)*init_params[p]/(Dx*init_solution)
     
-    #### CALCULATION OF SENSITIVITY INDICES ####
-    SI_AUC[comp,i] <- (AUC[comp,i]-init_AUC[comp])*init_params[i]/(Dx*init_AUC[comp])
   }
+  
+  
+  #thetas[i,]<-params[1:N_params]
+  #Total_SI[,,i] <- as.array(SI_AUC[,])
   params <- init_params
 }
 
-##### SINGULAR VALUE DECOMPOSITION OF SI_AUC MATRIX #####
-svd(SI_AUC)
+eigenvalues <- matrix(NA, nrow = N_exp, ncol=N_params)
+for (i in 1:N_exp) {
+  SVD_estimation <- svd(Total_SI[,,i])
+  eigenvalues[i,] <- unlist(SVD_estimation["d"])
+}
+print(eigenvalues)
+
+
+
+
 
 
